@@ -1,0 +1,16 @@
+{
+  "name": "vasey-space-iss-tracker",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "build": "node scripts/build.mjs",
+    "lint": "node scripts/lint.mjs",
+    "test": "node --test",
+    "test:watch": "node --test --watch"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

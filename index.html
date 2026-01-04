@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VASEY/SPACE — ISS Tracker</title>
+    <meta
+      name="description"
+      content="Real-time ISS tracking, pass predictions, and viewing recommendations for any location."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Reddit+Sans:wght@300;400;500;600&family=Sora:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <link rel="stylesheet" href="./src/style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="hero">
+        <div class="hero__content">
+          <p class="hero__eyebrow">VASEY/SPACE</p>
+          <h1>ISS Tracker</h1>
+          <p class="hero__subhead">
+            Real-time International Space Station tracking, personalized viewing windows, and synchronized 2D +
+            3D visualization.
+          </p>
+          <div class="hero__status">
+            <div>
+              <span class="label">ISS STATUS</span>
+              <p id="iss-status">Loading orbital data…</p>
+            </div>
+            <div>
+              <span class="label">NEXT PASS</span>
+              <p id="next-pass">Calculating passes…</p>
+            </div>
+            <div>
+              <span class="label">VISIBILITY</span>
+              <p id="visibility-state">—</p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <section class="panel location-panel" aria-labelledby="location-heading">
+          <div class="panel__header">
+            <h2 id="location-heading" class="section-title">LOCATION</h2>
+            <p class="section-description">Enter a city or coordinates to personalize pass predictions.</p>
+          </div>
+          <div class="location-panel__controls">
+            <label class="field">
+              <span>Search by city or place</span>
+              <input id="location-search" type="text" placeholder="Seattle, WA" autocomplete="off" />
+            </label>
+            <div class="field-group">
+              <label class="field">
+                <span>Latitude</span>
+                <input id="location-lat" type="number" step="0.0001" placeholder="47.6062" />
+              </label>
+              <label class="field">
+                <span>Longitude</span>
+                <input id="location-lon" type="number" step="0.0001" placeholder="-122.3321" />
+              </label>
+            </div>
+            <div class="button-row">
+              <button id="use-location" class="button button--primary" type="button">Use my location</button>
+              <button id="apply-location" class="button" type="button">Update predictions</button>
+            </div>
+            <p id="location-feedback" class="helper-text" role="status" aria-live="polite"></p>
+          </div>
+        </section>
+
+        <section class="panel" aria-labelledby="top-picks-heading">
+          <div class="panel__header">
+            <h2 id="top-picks-heading" class="section-title">TOP PICKS</h2>
+            <p class="section-description">Hand-picked viewing opportunities with the best sky conditions.</p>
+          </div>
+          <div id="top-picks" class="top-picks"></div>
+        </section>
+
+        <section class="panel visualization" aria-labelledby="visualization-heading">
+          <div class="panel__header">
+            <h2 id="visualization-heading" class="section-title">LIVE VISUALIZATION</h2>
+            <p class="section-description">Synchronized 2D ground track and interactive 3D globe.</p>
+          </div>
+          <div class="visualization__controls">
+            <button id="toggle-view" class="button" type="button">Toggle 2D / 3D</button>
+            <button id="center-iss" class="button" type="button">Center on ISS</button>
+            <button id="center-user" class="button" type="button">Center on my location</button>
+          </div>
+          <div class="visualization__grid">
+            <div class="map" id="map" role="region" aria-label="2D world map"></div>
+            <div class="globe" id="globe" role="region" aria-label="3D globe"></div>
+          </div>
+        </section>
+
+        <section class="panel" aria-labelledby="passes-heading">
+          <div class="panel__header">
+            <h2 id="passes-heading" class="section-title">UPCOMING PASSES</h2>
+            <p class="section-description">
+              Detailed rise, peak, and set times for your location. Only visible passes are marked.
+            </p>
+          </div>
+          <div id="passes" class="passes"></div>
+        </section>
+
+        <section class="panel settings" aria-labelledby="settings-heading">
+          <div class="panel__header">
+            <h2 id="settings-heading" class="section-title">SETTINGS</h2>
+            <p class="section-description">Customize units, refresh speed, and time format.</p>
+          </div>
+          <div class="settings__grid">
+            <label class="field">
+              <span>Units</span>
+              <select id="setting-units">
+                <option value="metric">Metric (km, km/s)</option>
+                <option value="imperial">Imperial (mi, mph)</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Update rate</span>
+              <select id="setting-rate">
+                <option value="1000">1 sec</option>
+                <option value="5000">5 sec</option>
+                <option value="10000">10 sec</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Time format</span>
+              <select id="setting-time">
+                <option value="24">24 hour</option>
+                <option value="12">12 hour</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Default view</span>
+              <select id="setting-view">
+                <option value="both">2D + 3D</option>
+                <option value="map">2D map only</option>
+                <option value="globe">3D globe only</option>
+              </select>
+            </label>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <p>
+          Powered by publicly available orbital data (Celestrak) and open-source tooling. Always verify viewing
+          conditions locally.
+        </p>
+      </footer>
+    </div>
+
+    <script src="./public/config.js"></script>
+    <script
+      src="https://unpkg.com/three@0.161.0/build/three.min.js"
+      crossorigin=""
+    ></script>
+    <script
+      src="https://unpkg.com/globe.gl@2.32.0/dist/globe.gl.min.js"
+      crossorigin=""
+    ></script>
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <script
+      src="https://unpkg.com/leaflet-terminator@1.0.2/L.Terminator.js"
+      crossorigin=""
+    ></script>
+    <script
+      src="https://unpkg.com/satellite.js@5.0.1/dist/satellite.min.js"
+      crossorigin=""
+    ></script>
+    <script
+      src="https://unpkg.com/suncalc@1.9.0/suncalc.js"
+      crossorigin=""
+    ></script>
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
