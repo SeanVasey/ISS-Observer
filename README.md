@@ -1,6 +1,15 @@
 # VASEY/SPACE — ISS Tracker
 
+[![JavaScript](https://img.shields.io/badge/JavaScript-ES2022-F7DF1E?logo=javascript&logoColor=000000)](https://developer.mozilla.org/docs/Web/JavaScript)
+[![HTML5](https://img.shields.io/badge/HTML5-Markup-E34F26?logo=html5&logoColor=ffffff)](https://developer.mozilla.org/docs/Web/HTML)
+[![CSS3](https://img.shields.io/badge/CSS3-Styles-1572B6?logo=css3&logoColor=ffffff)](https://developer.mozilla.org/docs/Web/CSS)
+[![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions&logoColor=ffffff)](.github/workflows/ci.yml)
+[![Status](https://img.shields.io/badge/Status-Active-2ea44f)](#)
+[![License](https://img.shields.io/badge/License-MIT-3DA639)](LICENSE)
+
 A modernized ISS tracking and sighting predictor experience that blends real-time orbital telemetry, viewing predictions, and synchronized 2D + 3D visualization.
+
+![VASEY/SPACE — ISS Tracker promotional hero image](docs/assets/iss-tracker-hero.svg)
 
 ![VASEY/SPACE — ISS Tracker interface preview](docs/assets/iss-tracker-ui.svg)
 

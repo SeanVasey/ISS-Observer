@@ -21,4 +21,8 @@ This project loads the following third-party assets and libraries at runtime:
   - Source: https://github.com/mourner/suncalc
   - License: BSD-2-Clause.
 
+Project-created assets:
+
+- `docs/assets/iss-tracker-hero.svg` — ISS tracker promotional hero artwork (MIT, created for this repository).
+
 If you replace or self-host assets, update this file accordingly.
