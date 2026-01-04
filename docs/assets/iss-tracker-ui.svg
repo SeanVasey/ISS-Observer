@@ -1,0 +1,32 @@
+<svg width="1400" height="900" viewBox="0 0 1400 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#171c25" />
+      <stop offset="100%" stop-color="#0b0d11" />
+    </linearGradient>
+  </defs>
+  <rect width="1400" height="900" fill="url(#bg)" />
+  <rect width="1400" height="120" fill="#1b202b" />
+  <rect y="120" width="1400" height="8" fill="#ff6b2c" />
+  <text x="60" y="75" fill="#f5f7fb" font-family="Sora, sans-serif" font-size="48" font-weight="700">VASEY/SPACE — ISS Tracker</text>
+  <text x="60" y="180" fill="#b3bcc8" font-family="Reddit Sans, sans-serif" font-size="24">Modern ISS tracking, pass predictions, and 2D/3D visualization.</text>
+  <g>
+    <rect x="60" y="240" width="360" height="200" rx="20" fill="#151922" stroke="#ff6b2c" stroke-width="2" />
+    <text x="90" y="290" fill="#ff6b2c" font-family="Bebas Neue, sans-serif" font-size="20" letter-spacing="3">TOP PICK</text>
+    <text x="90" y="330" fill="#f5f7fb" font-family="Sora, sans-serif" font-size="28">Fri 9:12 PM</text>
+    <text x="90" y="370" fill="#98a3b2" font-family="Reddit Sans, sans-serif" font-size="20">Peak 67° • 6m 02s</text>
+  </g>
+  <g>
+    <rect x="520" y="240" width="360" height="200" rx="20" fill="#151922" stroke="#ff6b2c" stroke-width="2" />
+    <text x="550" y="290" fill="#ff6b2c" font-family="Bebas Neue, sans-serif" font-size="20" letter-spacing="3">TOP PICK</text>
+    <text x="550" y="330" fill="#f5f7fb" font-family="Sora, sans-serif" font-size="28">Sat 10:48 PM</text>
+    <text x="550" y="370" fill="#98a3b2" font-family="Reddit Sans, sans-serif" font-size="20">Peak 58° • 5m 28s</text>
+  </g>
+  <g>
+    <rect x="980" y="240" width="360" height="200" rx="20" fill="#151922" stroke="#ff6b2c" stroke-width="2" />
+    <text x="1010" y="290" fill="#ff6b2c" font-family="Bebas Neue, sans-serif" font-size="20" letter-spacing="3">TOP PICK</text>
+    <text x="1010" y="330" fill="#f5f7fb" font-family="Sora, sans-serif" font-size="28">Sun 8:31 PM</text>
+    <text x="1010" y="370" fill="#98a3b2" font-family="Reddit Sans, sans-serif" font-size="20">Peak 74° • 6m 45s</text>
+  </g>
+  <text x="60" y="860" fill="#98a3b2" font-family="Reddit Sans, sans-serif" font-size="18">Preview placeholder. Capture live UI screenshot after running the app.</text>
+</svg>
