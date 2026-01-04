@@ -29,4 +29,5 @@
 - `SECURITY.md` — Vulnerability reporting.
 - `CODE_OF_CONDUCT.md` — Community guidelines.
 - `ASSETS_LICENSE.md` — Third-party asset attribution.
+- `docs/assets/iss-tracker-hero.svg` — ISS tracker promotional hero artwork.
 - `docs/assets/iss-tracker-ui.svg` — UI preview placeholder.
