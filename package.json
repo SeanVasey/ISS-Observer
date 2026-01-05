@@ -17,10 +17,10 @@
   },
   "cdn-dependencies": {
     "leaflet": "1.9.4",
-    "leaflet-terminator": "1.0.2",
+    "@joergdietrich/leaflet.terminator": "1.0.0",
     "three": "0.161.0",
     "globe.gl": "2.32.0",
-    "satellite.js": "5.0.1",
+    "satellite.js": "5.0.0",
     "suncalc": "1.9.0"
   },
   "keywords": [

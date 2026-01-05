@@ -1,4 +1,6 @@
-const { L, Globe, THREE, terminator } = window;
+// Library references - resolved dynamically after loading
+let L, Globe, THREE, terminator;
+
 import {
   formatCoord,
   formatAltitude,
@@ -16,6 +18,34 @@ import {
   getSunSubPoint
 } from './lib/orbit.js';
 import { computePasses, describeVisibility } from './lib/passes.js';
+
+// Wait for external libraries to load
+const waitForLibraries = (maxAttempts = 50, interval = 100) => {
+  return new Promise((resolve, reject) => {
+    let attempts = 0;
+    const check = () => {
+      attempts++;
+      const missing = [];
+      if (!window.L) missing.push('Leaflet');
+      if (!window.Globe) missing.push('Globe.gl');
+      if (!window.THREE) missing.push('Three.js');
+
+      if (missing.length === 0) {
+        // Assign to module-level variables
+        L = window.L;
+        Globe = window.Globe;
+        THREE = window.THREE;
+        terminator = window.terminator || window.L?.terminator;
+        resolve();
+      } else if (attempts >= maxAttempts) {
+        reject(new Error(`Failed to load libraries: ${missing.join(', ')}. Try disabling ad blockers or browser shields.`));
+      } else {
+        setTimeout(check, interval);
+      }
+    };
+    check();
+  });
+};
 
 const state = {
   satrec: null,
@@ -713,16 +743,19 @@ const hydrateFromUrl = () => {
 };
 
 const init = async () => {
-  const missing = [];
-  if (!L) missing.push('Leaflet');
-  if (!Globe) missing.push('Globe.gl');
-  if (!THREE) missing.push('Three.js');
-  if (missing.length) {
-    elements.issStatus.textContent = `Missing required libraries: ${missing.join(', ')}`;
+  // Wait for external libraries to load (with retry)
+  elements.issStatus.textContent = 'Loading libraries...';
+  try {
+    await waitForLibraries();
+  } catch (error) {
+    elements.issStatus.textContent = error.message;
     elements.locationFeedback.textContent =
-      'Check your network connection and refresh.';
+      'Try refreshing the page or disabling browser shields/ad blockers for this site.';
+    console.error('Library loading failed:', error);
     return;
   }
+
+  elements.issStatus.textContent = 'Initializing...';
   loadSettings();
   hydrateFromUrl();
   initVisualization();
