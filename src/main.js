@@ -61,34 +61,113 @@ let lastTerminatorUpdate = 0;
 let lastTrackUpdate = 0;
 let cachedTrack = [];
 
+// NASA ISS Icon SVG - Orange/White contrasting design
+const issIconSvg = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32">
+  <!-- Main body - central module -->
+  <rect x="24" y="28" width="16" height="8" rx="2" fill="#ff6b2c" stroke="#fff" stroke-width="1"/>
+
+  <!-- Solar panel left -->
+  <g transform="rotate(-5 20 32)">
+    <rect x="2" y="26" width="18" height="12" rx="1" fill="#1a1a2e" stroke="#ff6b2c" stroke-width="1.5"/>
+    <line x1="5" y1="26" x2="5" y2="38" stroke="#ff6b2c" stroke-width="0.5" opacity="0.7"/>
+    <line x1="8" y1="26" x2="8" y2="38" stroke="#ff6b2c" stroke-width="0.5" opacity="0.7"/>
+    <line x1="11" y1="26" x2="11" y2="38" stroke="#ff6b2c" stroke-width="0.5" opacity="0.7"/>
+    <line x1="14" y1="26" x2="14" y2="38" stroke="#ff6b2c" stroke-width="0.5" opacity="0.7"/>
+    <line x1="17" y1="26" x2="17" y2="38" stroke="#ff6b2c" stroke-width="0.5" opacity="0.7"/>
+  </g>
+
+  <!-- Solar panel right -->
+  <g transform="rotate(5 44 32)">
+    <rect x="44" y="26" width="18" height="12" rx="1" fill="#1a1a2e" stroke="#ff6b2c" stroke-width="1.5"/>
+    <line x1="47" y1="26" x2="47" y2="38" stroke="#ff6b2c" stroke-width="0.5" opacity="0.7"/>
+    <line x1="50" y1="26" x2="50" y2="38" stroke="#ff6b2c" stroke-width="0.5" opacity="0.7"/>
+    <line x1="53" y1="26" x2="53" y2="38" stroke="#ff6b2c" stroke-width="0.5" opacity="0.7"/>
+    <line x1="56" y1="26" x2="56" y2="38" stroke="#ff6b2c" stroke-width="0.5" opacity="0.7"/>
+    <line x1="59" y1="26" x2="59" y2="38" stroke="#ff6b2c" stroke-width="0.5" opacity="0.7"/>
+  </g>
+
+  <!-- Truss structure -->
+  <rect x="20" y="30" width="24" height="4" fill="#722f37" stroke="#fff" stroke-width="0.5"/>
+
+  <!-- Modules -->
+  <ellipse cx="32" cy="32" rx="4" ry="3" fill="#fff" stroke="#ff6b2c" stroke-width="1"/>
+  <circle cx="28" cy="32" r="2" fill="#ff6b2c" opacity="0.9"/>
+  <circle cx="36" cy="32" r="2" fill="#ff6b2c" opacity="0.9"/>
+
+  <!-- Radiators -->
+  <rect x="22" y="20" width="3" height="6" fill="#fff" opacity="0.8"/>
+  <rect x="39" y="20" width="3" height="6" fill="#fff" opacity="0.8"/>
+  <rect x="22" y="38" width="3" height="6" fill="#fff" opacity="0.8"/>
+  <rect x="39" y="38" width="3" height="6" fill="#fff" opacity="0.8"/>
+
+  <!-- Glow effect -->
+  <ellipse cx="32" cy="32" rx="8" ry="6" fill="none" stroke="#ff6b2c" stroke-width="0.5" opacity="0.5">
+    <animate attributeName="opacity" values="0.3;0.7;0.3" dur="2s" repeatCount="indefinite"/>
+    <animate attributeName="rx" values="8;10;8" dur="2s" repeatCount="indefinite"/>
+    <animate attributeName="ry" values="6;8;6" dur="2s" repeatCount="indefinite"/>
+  </ellipse>
+</svg>`;
+
+// Create custom Leaflet icon for ISS
+const createIssIcon = () => {
+  return L.divIcon({
+    className: 'iss-marker',
+    html: `<div class="iss-icon">${issIconSvg}</div>`,
+    iconSize: [32, 32],
+    iconAnchor: [16, 16]
+  });
+};
+
 const createTerminator = () =>
   typeof terminator === 'function' ? terminator() : L.terminator();
 
 const initVisualization = () => {
   map = L.map('map', {
     worldCopyJump: true,
-    zoomControl: false
+    zoomControl: false,
+    fadeAnimation: true,
+    zoomAnimation: true
   }).setView([state.observer.lat, state.observer.lon], 2);
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
+  // Use dark-themed map tiles for better contrast
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+    subdomains: 'abcd',
+    maxZoom: 19
   }).addTo(map);
 
-  issMarker = L.circleMarker([0, 0], {
-    radius: 6,
+  // Use custom ISS icon marker
+  issMarker = L.marker([0, 0], {
+    icon: createIssIcon(),
+    zIndexOffset: 1000
+  }).addTo(map);
+
+  // Enhanced ground track with gradient effect
+  trackLine = L.polyline([], {
     color: '#ff6b2c',
-    fillColor: '#ff6b2c',
-    fillOpacity: 0.9
+    weight: 2,
+    opacity: 0.8,
+    smoothFactor: 1,
+    className: 'iss-track'
   }).addTo(map);
 
-  trackLine = L.polyline([], { color: '#f5f7fb', weight: 1 }).addTo(map);
+  // Add future track (lighter)
+  const futureTrack = L.polyline([], {
+    color: '#722f37',
+    weight: 1.5,
+    opacity: 0.5,
+    dashArray: '5, 10',
+    className: 'iss-track-future'
+  }).addTo(map);
+
   terminatorLayer = createTerminator();
   terminatorLayer.addTo(map);
 
   const globeContainer = document.getElementById('globe');
   globe = Globe()(globeContainer)
     .globeImageUrl(
-      'https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg'
+      'https://unpkg.com/three-globe/example/img/earth-night.jpg'
     )
     .bumpImageUrl(
       'https://unpkg.com/three-globe/example/img/earth-topology.png'
@@ -96,18 +175,38 @@ const initVisualization = () => {
     .backgroundColor('#0b0d11')
     .showAtmosphere(true)
     .atmosphereColor('#ff6b2c')
-    .atmosphereAltitude(0.15)
-    .pointAltitude(0.02)
+    .atmosphereAltitude(0.2)
+    .pointAltitude(0.025)
     .pointColor(() => '#ff6b2c')
-    .pointRadius(0.4)
-    .pathColor(() => '#ffffff')
-    .pathStroke(1.2)
-    .pathPointAlt(() => 0.02);
+    .pointRadius(0.5)
+    .pathColor(() => ['#ff6b2c', '#722f37'])
+    .pathStroke(2)
+    .pathPointAlt(() => 0.015)
+    .pathTransitionDuration(0);
 
+  // Enhanced controls for smoother interaction
   globe.controls().enableDamping = true;
-  light = new THREE.DirectionalLight('#ffffff', 1.2);
+  globe.controls().dampingFactor = 0.1;
+  globe.controls().rotateSpeed = 0.5;
+  globe.controls().zoomSpeed = 0.8;
+  globe.controls().autoRotate = false;
+
+  // Add ambient light for better visibility
+  const ambientLight = new THREE.AmbientLight('#ffffff', 0.3);
+  globe.scene().add(ambientLight);
+
+  // Main directional light (sun)
+  light = new THREE.DirectionalLight('#ffffff', 1.5);
   light.position.set(1, 1, 1);
   globe.scene().add(light);
+
+  // Add subtle point light at ISS position for glow effect
+  const issGlow = new THREE.PointLight('#ff6b2c', 0.5, 50);
+  issGlow.position.set(0, 0, 1.02);
+  globe.scene().add(issGlow);
+
+  // Store glow reference for updates
+  globe._issGlow = issGlow;
 };
 
 const loadSettings = () => {
@@ -356,12 +455,18 @@ const updateNextPass = () => {
 
 const updateMapAndGlobe = (position) => {
   if (!position) return;
+
+  // Smooth marker update on 2D map
   issMarker.setLatLng([position.lat, position.lon]);
+
+  // Update ground track every 60 seconds
   if (Date.now() - lastTrackUpdate > 60 * 1000) {
     cachedTrack = computeGroundTrack(state.satrec, new Date(), 90, 60);
     trackLine.setLatLngs(cachedTrack.map((point) => [point.lat, point.lon]));
     lastTrackUpdate = Date.now();
   }
+
+  // Update terminator (day/night) every 5 minutes
   if (Date.now() - lastTerminatorUpdate > 5 * 60 * 1000) {
     terminatorLayer.remove();
     terminatorLayer = createTerminator();
@@ -369,7 +474,15 @@ const updateMapAndGlobe = (position) => {
     lastTerminatorUpdate = Date.now();
   }
 
-  globe.pointsData([{ lat: position.lat, lng: position.lon }]);
+  // Update 3D globe ISS position with smooth transition
+  globe.pointsData([{
+    lat: position.lat,
+    lng: position.lon,
+    altitude: 0.025,
+    color: '#ff6b2c'
+  }]);
+
+  // Update ground track on globe
   globe.pathsData([
     {
       path: cachedTrack.map((point) => ({
@@ -378,6 +491,18 @@ const updateMapAndGlobe = (position) => {
       }))
     }
   ]);
+
+  // Update ISS glow position on globe
+  if (globe._issGlow) {
+    const phi = THREE.MathUtils.degToRad(90 - position.lat);
+    const theta = THREE.MathUtils.degToRad(position.lon + 180);
+    const radius = 1.025;
+    globe._issGlow.position.set(
+      radius * Math.sin(phi) * Math.cos(theta),
+      radius * Math.cos(phi),
+      radius * Math.sin(phi) * Math.sin(theta)
+    );
+  }
 };
 
 const updateLoop = () => {
@@ -413,7 +538,15 @@ const applyLocation = async (lat, lon, name = '') => {
     'vasey-location',
     JSON.stringify({ lat, lon, name: state.locationName })
   );
-  map.setView([lat, lon], 3);
+  // Smooth fly-to animation
+  map.flyTo([lat, lon], 3, {
+    duration: 1.5,
+    easeLinearity: 0.25
+  });
+  // Also update globe view
+  if (globe) {
+    globe.pointOfView({ lat, lng: lon, altitude: 2.5 }, 1500);
+  }
   updateLocationInputs();
   recalcPasses();
   elements.locationFeedback.textContent = `Location set to ${state.locationName}.`;
@@ -502,18 +635,34 @@ const bindEvents = () => {
   elements.centerIss.addEventListener('click', () => {
     const position = computePosition(state.satrec, new Date());
     if (position) {
-      map.setView([position.lat, position.lon], 3);
-      globe.pointOfView({ lat: position.lat, lng: position.lon, altitude: 2 });
+      // Smooth fly-to animation on 2D map
+      map.flyTo([position.lat, position.lon], 3, {
+        duration: 1.5,
+        easeLinearity: 0.25
+      });
+      // Smooth transition on 3D globe
+      globe.pointOfView(
+        { lat: position.lat, lng: position.lon, altitude: 2 },
+        1500
+      );
     }
   });
 
   elements.centerUser.addEventListener('click', () => {
-    map.setView([state.observer.lat, state.observer.lon], 4);
-    globe.pointOfView({
-      lat: state.observer.lat,
-      lng: state.observer.lon,
-      altitude: 2
+    // Smooth fly-to animation on 2D map
+    map.flyTo([state.observer.lat, state.observer.lon], 4, {
+      duration: 1.5,
+      easeLinearity: 0.25
     });
+    // Smooth transition on 3D globe
+    globe.pointOfView(
+      {
+        lat: state.observer.lat,
+        lng: state.observer.lon,
+        altitude: 2
+      },
+      1500
+    );
   });
 
   elements.settingUnits.addEventListener('change', (event) => {

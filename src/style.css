@@ -7,9 +7,50 @@
   --muted: #9aa4b2;
   --accent: #ff6b2c;
   --accent-soft: rgba(255, 107, 44, 0.2);
+  --maroon: #722f37;
+  --burgundy: #4a1c23;
+  --maroon-soft: rgba(114, 47, 55, 0.3);
   --border: rgba(255, 255, 255, 0.08);
   --shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+  --glow-orange: 0 0 20px rgba(255, 107, 44, 0.6);
+  --glow-maroon: 0 0 15px rgba(114, 47, 55, 0.5);
   font-family: 'Reddit Sans', system-ui, -apple-system, sans-serif;
+}
+
+/* Keyframe Animations */
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.05); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 5px var(--accent), 0 0 10px var(--accent); }
+  50% { box-shadow: 0 0 15px var(--accent), 0 0 25px var(--accent), 0 0 35px rgba(255, 107, 44, 0.4); }
+}
+
+@keyframes orbit {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
 }
 
 * {
@@ -70,6 +111,16 @@ h3 {
   margin: 0 0 0.6rem;
 }
 
+.hero__title-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.hero__icon {
+  flex-shrink: 0;
+}
+
 .hero h1 {
   font-size: clamp(2.2rem, 4vw, 3.4rem);
 }
@@ -111,6 +162,13 @@ main {
   padding: 1.8rem;
   border: 1px solid var(--border);
   box-shadow: var(--shadow);
+  animation: fadeIn 0.5s ease-out;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.panel:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow), 0 0 30px rgba(0, 0, 0, 0.2);
 }
 
 .panel__header {
@@ -194,6 +252,14 @@ main {
   border-radius: 14px;
   padding: 1rem 1.2rem;
   border: 1px solid var(--border);
+  animation: slideIn 0.4s ease-out;
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px) scale(1.01);
+  border-color: var(--maroon);
+  box-shadow: var(--glow-maroon);
 }
 
 .card__title {
@@ -217,6 +283,22 @@ main {
   border-radius: 999px;
   background: var(--accent-soft);
   color: var(--accent);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.badge:hover {
+  transform: scale(1.05);
+  box-shadow: var(--glow-orange);
+}
+
+.badge--visible {
+  background: linear-gradient(135deg, var(--accent-soft), var(--maroon-soft));
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.badge--score {
+  background: linear-gradient(135deg, var(--burgundy), var(--maroon));
+  color: var(--text);
 }
 
 .visualization__controls {
@@ -239,6 +321,34 @@ main {
   overflow: hidden;
   border: 1px solid var(--border);
   background: #0d1117;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+}
+
+.map:hover,
+.globe:hover {
+  border-color: var(--maroon);
+  box-shadow: 0 0 25px rgba(114, 47, 55, 0.3);
+}
+
+.map::after,
+.globe::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--maroon), var(--burgundy));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.map:hover::after,
+.globe:hover::after {
+  opacity: 1;
 }
 
 .passes {
@@ -254,6 +364,14 @@ main {
   border-radius: 12px;
   padding: 1rem;
   background: var(--panel-strong);
+  animation: fadeIn 0.4s ease-out;
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.pass:hover {
+  transform: translateX(5px);
+  border-color: var(--accent);
+  box-shadow: -4px 0 20px rgba(255, 107, 44, 0.15);
 }
 
 .pass__header {
@@ -290,6 +408,203 @@ main {
   color: var(--muted);
   font-size: 0.85rem;
   padding: 0 6vw 2rem;
+}
+
+/* ISS Icon and Marker Styles */
+.iss-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  animation: float 3s ease-in-out infinite;
+}
+
+.iss-icon svg {
+  filter: drop-shadow(0 0 8px var(--accent));
+  transition: filter 0.3s ease, transform 0.3s ease;
+}
+
+.iss-icon:hover svg {
+  filter: drop-shadow(0 0 15px var(--accent)) drop-shadow(0 0 25px var(--maroon));
+  transform: scale(1.1);
+}
+
+/* Live Status Indicator */
+.status-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.status-live::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background: var(--accent);
+  border-radius: 50%;
+  animation: pulse 1.5s ease-in-out infinite;
+  box-shadow: 0 0 10px var(--accent);
+}
+
+/* Loading State */
+.loading {
+  position: relative;
+  overflow: hidden;
+}
+
+.loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 107, 44, 0.1),
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
+}
+
+/* Hero Status Items Animation */
+.hero__status > div {
+  animation: fadeIn 0.6s ease-out;
+  animation-fill-mode: both;
+}
+
+.hero__status > div:nth-child(1) { animation-delay: 0.1s; }
+.hero__status > div:nth-child(2) { animation-delay: 0.2s; }
+.hero__status > div:nth-child(3) { animation-delay: 0.3s; }
+
+/* ISS Ground Track Animation */
+.leaflet-interactive {
+  transition: stroke-width 0.3s ease;
+}
+
+.leaflet-marker-icon.iss-marker {
+  animation: glow 2s ease-in-out infinite;
+}
+
+/* Custom ISS Marker on Leaflet Map */
+.iss-marker {
+  background: transparent !important;
+  border: none !important;
+}
+
+.iss-marker .iss-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 0 10px var(--accent)) drop-shadow(0 0 20px rgba(255, 107, 44, 0.5));
+}
+
+.iss-marker .iss-icon svg {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* ISS Track Styling */
+.iss-track {
+  filter: drop-shadow(0 0 3px var(--accent));
+}
+
+.iss-track-future {
+  filter: drop-shadow(0 0 2px var(--maroon));
+}
+
+/* Globe Container Enhancement */
+#globe canvas {
+  transition: filter 0.3s ease;
+}
+
+#globe:hover canvas {
+  filter: brightness(1.05) saturate(1.1);
+}
+
+/* Button Enhanced Animations */
+.button {
+  position: relative;
+  overflow: hidden;
+}
+
+.button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 107, 44, 0.2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.4s ease, height 0.4s ease;
+}
+
+.button:hover::before {
+  width: 200%;
+  height: 200%;
+}
+
+.button--primary::before {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Top Picks Card Enhanced Hover */
+.top-picks .card {
+  position: relative;
+  overflow: hidden;
+}
+
+.top-picks .card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 107, 44, 0.05),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.top-picks .card:hover::before {
+  left: 100%;
+}
+
+/* Section Title Animation */
+.section-title {
+  position: relative;
+  display: inline-block;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--maroon));
+  transition: width 0.3s ease;
+}
+
+.panel:hover .section-title::after {
+  width: 100%;
+}
+
+/* Visualization Panel Special Treatment */
+.visualization {
+  background: linear-gradient(180deg, var(--panel) 0%, rgba(18, 21, 27, 0.95) 100%);
+  border: 1px solid var(--maroon-soft);
+}
+
+.visualization:hover {
+  border-color: var(--maroon);
 }
 
 @media (max-width: 900px) {
