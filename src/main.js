@@ -19,9 +19,18 @@ import {
 } from './lib/orbit.js';
 import { computePasses, describeVisibility } from './lib/passes.js';
 
-// Wait for external libraries to load
-const waitForLibraries = (maxAttempts = 50, interval = 100) => {
-  return new Promise((resolve, reject) => {
+// Wait for external libraries to load with fallback support
+const waitForLibraries = (maxAttempts = 100, interval = 150) => {
+  return new Promise(async (resolve, reject) => {
+    // Wait for any fallback loading to complete first
+    if (window._libLoadPromises) {
+      try {
+        await Promise.allSettled(window._libLoadPromises);
+      } catch (e) {
+        console.warn('Fallback loading completed with some errors:', e);
+      }
+    }
+
     let attempts = 0;
     const check = () => {
       attempts++;
@@ -36,9 +45,13 @@ const waitForLibraries = (maxAttempts = 50, interval = 100) => {
         Globe = window.Globe;
         THREE = window.THREE;
         terminator = window.terminator || window.L?.terminator;
+        console.log('All libraries loaded successfully');
         resolve();
       } else if (attempts >= maxAttempts) {
-        reject(new Error(`Failed to load libraries: ${missing.join(', ')}. Try disabling ad blockers or browser shields.`));
+        const errorMsg = `Failed to load: ${missing.join(', ')}. ` +
+          'This may be due to ad blockers or privacy shields. ' +
+          'Try: 1) Disable shields for this site, 2) Use Safari/Chrome, or 3) Refresh the page.';
+        reject(new Error(errorMsg));
       } else {
         setTimeout(check, interval);
       }
