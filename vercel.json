@@ -24,27 +24,18 @@
       ]
     },
     {
-      "source": "/src/(.*)",
+      "source": "/assets/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
           "value": "public, max-age=31536000, immutable"
         }
       ]
-    },
-    {
-      "source": "/public/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=3600"
-        }
-      ]
     }
   ],
   "rewrites": [
     {
-      "source": "/((?!src|public|assets).*)",
+      "source": "/((?!assets).*)",
       "destination": "/index.html"
     }
   ]
