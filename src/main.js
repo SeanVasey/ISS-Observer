@@ -1,5 +1,17 @@
-// Library references - resolved dynamically after loading
-let L, Globe, THREE, terminator;
+// Import libraries from npm packages (bundled by Vite)
+import * as THREE from 'three';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import Globe from 'globe.gl';
+import * as satellite from 'satellite.js';
+import SunCalc from 'suncalc';
+
+// Import leaflet terminator after leaflet is loaded
+import '@joergdietrich/leaflet.terminator';
+
+// Make satellite and SunCalc available globally for lib modules
+globalThis.satellite = satellite;
+globalThis.SunCalc = SunCalc;
 
 import {
   formatCoord,
@@ -18,47 +30,6 @@ import {
   getSunSubPoint
 } from './lib/orbit.js';
 import { computePasses, describeVisibility } from './lib/passes.js';
-
-// Wait for external libraries to load with fallback support
-const waitForLibraries = (maxAttempts = 100, interval = 150) => {
-  return new Promise(async (resolve, reject) => {
-    // Wait for any fallback loading to complete first
-    if (window._libLoadPromises) {
-      try {
-        await Promise.allSettled(window._libLoadPromises);
-      } catch (e) {
-        console.warn('Fallback loading completed with some errors:', e);
-      }
-    }
-
-    let attempts = 0;
-    const check = () => {
-      attempts++;
-      const missing = [];
-      if (!window.L) missing.push('Leaflet');
-      if (!window.Globe) missing.push('Globe.gl');
-      if (!window.THREE) missing.push('Three.js');
-
-      if (missing.length === 0) {
-        // Assign to module-level variables
-        L = window.L;
-        Globe = window.Globe;
-        THREE = window.THREE;
-        terminator = window.terminator || window.L?.terminator;
-        console.log('All libraries loaded successfully');
-        resolve();
-      } else if (attempts >= maxAttempts) {
-        const errorMsg = `Failed to load: ${missing.join(', ')}. ` +
-          'This may be due to ad blockers or privacy shields. ' +
-          'Try: 1) Disable shields for this site, 2) Use Safari/Chrome, or 3) Refresh the page.';
-        reject(new Error(errorMsg));
-      } else {
-        setTimeout(check, interval);
-      }
-    };
-    check();
-  });
-};
 
 const state = {
   satrec: null,
@@ -162,8 +133,7 @@ const createIssIcon = () => {
   });
 };
 
-const createTerminator = () =>
-  typeof terminator === 'function' ? terminator() : L.terminator();
+const createTerminator = () => L.terminator();
 
 const initVisualization = () => {
   map = L.map('map', {
@@ -756,18 +726,7 @@ const hydrateFromUrl = () => {
 };
 
 const init = async () => {
-  // Wait for external libraries to load (with retry)
-  elements.issStatus.textContent = 'Loading libraries...';
-  try {
-    await waitForLibraries();
-  } catch (error) {
-    elements.issStatus.textContent = error.message;
-    elements.locationFeedback.textContent =
-      'Try refreshing the page or disabling browser shields/ad blockers for this site.';
-    console.error('Library loading failed:', error);
-    return;
-  }
-
+  // Libraries are now bundled, no need to wait for CDN loading
   elements.issStatus.textContent = 'Initializing...';
   loadSettings();
   hydrateFromUrl();

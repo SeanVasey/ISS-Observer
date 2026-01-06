@@ -213,63 +213,13 @@
       </footer>
     </div>
 
-    <script src="./public/config.js"></script>
-    <!-- CDN Libraries - Using Cloudflare CDN (cdnjs) as primary for better compatibility -->
-    <!-- Three.js - 3D graphics library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.161.0/three.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <!-- Leaflet - 2D mapping library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <!-- Satellite.js - SGP4 orbital propagation -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/satellite.js/5.0.0/satellite.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <!-- SunCalc - Solar position calculations -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.9.0/suncalc.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <!-- Globe.gl - 3D globe visualization (not on cdnjs, use jsdelivr) -->
-    <script src="https://cdn.jsdelivr.net/npm/globe.gl@2.32.0/dist/globe.gl.min.js" crossorigin="anonymous"></script>
-    <!-- Leaflet Terminator - Day/night overlay -->
-    <script src="https://cdn.jsdelivr.net/npm/@joergdietrich/leaflet.terminator@1.0.0/L.Terminator.min.js" crossorigin="anonymous"></script>
-    <!-- Fallback loader for blocked CDNs -->
+    <!-- Configuration - inline to avoid loading issues -->
     <script>
-      (function() {
-        const loadScript = (src) => {
-          return new Promise((resolve, reject) => {
-            const s = document.createElement('script');
-            s.src = src;
-            s.crossOrigin = 'anonymous';
-            s.onload = resolve;
-            s.onerror = reject;
-            document.head.appendChild(s);
-          });
-        };
-        const fallbacks = [
-          { name: 'THREE', check: () => window.THREE, urls: [
-            'https://unpkg.com/three@0.161.0/build/three.min.js',
-            'https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.min.js'
-          ]},
-          { name: 'L', check: () => window.L, urls: [
-            'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
-            'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js'
-          ]},
-          { name: 'Globe', check: () => window.Globe, urls: [
-            'https://unpkg.com/globe.gl@2.32.0/dist/globe.gl.min.js'
-          ]},
-          { name: 'satellite', check: () => window.satellite, urls: [
-            'https://unpkg.com/satellite.js@5.0.0/dist/satellite.min.js'
-          ]}
-        ];
-        window._libLoadPromises = fallbacks.map(async (lib) => {
-          if (lib.check()) return;
-          for (const url of lib.urls) {
-            try {
-              console.warn(`Loading ${lib.name} from fallback: ${url}`);
-              await loadScript(url);
-              if (lib.check()) return;
-            } catch (e) {
-              console.warn(`Failed to load ${lib.name} from ${url}`);
-            }
-          }
-        });
-      })();
+      window.VASEY_CONFIG = {
+        nominatimEmail: ''
+      };
     </script>
+    <!-- Main application - all dependencies are bundled by Vite -->
     <script type="module" src="./src/main.js"></script>
   </body>
 </html>
