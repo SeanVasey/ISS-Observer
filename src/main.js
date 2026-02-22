@@ -37,7 +37,7 @@ const state = {
   locationName: 'Seattle, WA',
   passes: [],
   settings: {
-    units: 'metric',
+    units: 'imperial',
     updateRate: 1000,
     timeFormat: '24',
     view: 'both'
@@ -685,6 +685,15 @@ const searchLocation = async (query) => {
 };
 
 const bindEvents = () => {
+  // Settings dropdown toggle
+  const settingsToggle = document.querySelector('#settings-toggle');
+  if (settingsToggle) {
+    settingsToggle.addEventListener('click', () => {
+      const expanded = settingsToggle.getAttribute('aria-expanded') === 'true';
+      settingsToggle.setAttribute('aria-expanded', String(!expanded));
+    });
+  }
+
   window.addEventListener('resize', () => {
     const globeEl = document.querySelector('#globe');
     if (globe && map) {
