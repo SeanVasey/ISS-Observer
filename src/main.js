@@ -78,6 +78,9 @@ let lastTerminatorUpdate = 0;
 let lastTrackUpdate = 0;
 let cachedTrack = [];
 let cachedFutureTrack = [];
+let passPage = 0;
+const PASSES_PER_PAGE = 5;
+const MAX_DISPLAY_PASSES = 25;
 
 // Monochrome ISS Icon SVG for map marker
 const issIconSvg = `
@@ -233,7 +236,11 @@ const initVisualization = () => {
 const loadSettings = () => {
   try {
     const saved = localStorage.getItem('vasey-settings');
-    if (!saved) return;
+    if (!saved) {
+      // Persist defaults (imperial) for new users
+      persistSettings();
+      return;
+    }
     const parsed = JSON.parse(saved);
     state.settings = { ...state.settings, ...parsed };
   } catch {
@@ -402,6 +409,131 @@ const createICS = (pass) => {
   ].join('\n');
 };
 
+const getDisplayPasses = () => {
+  const now = new Date();
+  const upcoming = state.passes.filter((p) => p.end > now);
+
+  // Prioritize visible passes: put first 2 upcoming visible at top, then
+  // up to 3 more high-score visible, then fill with chronological
+  const visible = upcoming.filter((p) => p.visible);
+  const nonVisible = upcoming.filter((p) => !p.visible);
+
+  // First 2 upcoming visible (by time)
+  const firstVisible = visible.slice(0, 2);
+  // Up to 3 more visible sorted by score
+  const bonusVisible = visible
+    .slice(2)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3);
+
+  const prioritized = [...firstVisible, ...bonusVisible];
+  const prioritizedSet = new Set(prioritized);
+
+  // Fill remaining slots with chronological passes (visible or not)
+  const rest = upcoming
+    .filter((p) => !prioritizedSet.has(p))
+    .slice(0, MAX_DISPLAY_PASSES - prioritized.length);
+
+  // Combine and sort all chronologically
+  return [...prioritized, ...rest].sort((a, b) => a.start - b.start).slice(0, MAX_DISPLAY_PASSES);
+};
+
+const renderPassCard = (pass) => {
+  const container = document.createElement('div');
+  container.className = `pass${pass.visible ? ' pass--visible' : ''}`;
+  const directionLabel = `${formatAzimuth(pass.startAz)} → ${formatAzimuth(
+    pass.endAz
+  )}`;
+  container.innerHTML = `
+    <div class="pass__header">
+      <div>
+        <div class="badge${pass.visible ? ' badge--visible' : ''}">${pass.visible ? 'Visible' : 'Overhead'}</div>
+        <p class="card__title">${formatDateTime(
+          pass.start,
+          state.settings.timeFormat
+        )}</p>
+        <p class="card__meta">${describeVisibility(pass)}</p>
+      </div>
+      <div class="pass__actions">
+        <button class="button button--small" data-share>Share</button>
+        <button class="button button--small" data-remind>Reminder</button>
+      </div>
+    </div>
+    <div>
+      <div class="pass__label">Start</div>
+      <div class="pass__value">${formatTime(
+        pass.start,
+        state.settings.timeFormat
+      )}</div>
+    </div>
+    <div>
+      <div class="pass__label">Peak</div>
+      <div class="pass__value">${formatTime(
+        pass.peakTime,
+        state.settings.timeFormat
+      )} | ${pass.maxElevation.toFixed(0)}°</div>
+    </div>
+    <div>
+      <div class="pass__label">End</div>
+      <div class="pass__value">${formatTime(
+        pass.end,
+        state.settings.timeFormat
+      )}</div>
+    </div>
+    <div>
+      <div class="pass__label">Direction</div>
+      <div class="pass__value">${directionLabel}</div>
+    </div>
+    <div>
+      <div class="pass__label">Duration</div>
+      <div class="pass__value">${formatDuration(pass.duration)}</div>
+    </div>
+    <div>
+      <div class="pass__label">Brightness</div>
+      <div class="pass__value">${pass.brightness}</div>
+    </div>
+  `;
+  const shareButton = container.querySelector('[data-share]');
+  const remindButton = container.querySelector('[data-remind]');
+
+  shareButton.addEventListener('click', async () => {
+    const shareUrl = buildShareUrl(pass);
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'ISS pass details',
+          text: `Next ISS pass over ${state.locationName}`,
+          url: shareUrl
+        });
+      } catch {
+        // User cancelled share dialog
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        elements.locationFeedback.textContent =
+          'Share link copied to clipboard.';
+      } catch {
+        elements.locationFeedback.textContent =
+          'Unable to copy link.';
+      }
+    }
+  });
+
+  remindButton.addEventListener('click', () => {
+    const ics = createICS(pass);
+    const blob = new Blob([ics], { type: 'text/calendar' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `iss-pass-${pass.start.toISOString().slice(0, 10)}.ics`;
+    link.click();
+    URL.revokeObjectURL(url);
+  });
+
+  return container;
+};
+
 const renderPasses = () => {
   elements.passes.innerHTML = '';
   if (!state.passes.length) {
@@ -410,101 +542,42 @@ const renderPasses = () => {
     return;
   }
 
-  state.passes.slice(0, 12).forEach((pass) => {
-    const container = document.createElement('div');
-    container.className = `pass${pass.visible ? ' pass--visible' : ''}`;
-    const directionLabel = `${formatAzimuth(pass.startAz)} → ${formatAzimuth(
-      pass.endAz
-    )}`;
-    container.innerHTML = `
-      <div class="pass__header">
-        <div>
-          <div class="badge${pass.visible ? ' badge--visible' : ''}">${pass.visible ? 'Visible' : 'Overhead'}</div>
-          <p class="card__title">${formatDateTime(
-            pass.start,
-            state.settings.timeFormat
-          )}</p>
-          <p class="card__meta">${describeVisibility(pass)}</p>
-        </div>
-        <div class="pass__actions">
-          <button class="button button--small" data-share>Share</button>
-          <button class="button button--small" data-remind>Reminder</button>
-        </div>
-      </div>
-      <div>
-        <div class="pass__label">Start</div>
-        <div class="pass__value">${formatTime(
-          pass.start,
-          state.settings.timeFormat
-        )}</div>
-      </div>
-      <div>
-        <div class="pass__label">Peak</div>
-        <div class="pass__value">${formatTime(
-          pass.peakTime,
-          state.settings.timeFormat
-        )} | ${pass.maxElevation.toFixed(0)}°</div>
-      </div>
-      <div>
-        <div class="pass__label">End</div>
-        <div class="pass__value">${formatTime(
-          pass.end,
-          state.settings.timeFormat
-        )}</div>
-      </div>
-      <div>
-        <div class="pass__label">Direction</div>
-        <div class="pass__value">${directionLabel}</div>
-      </div>
-      <div>
-        <div class="pass__label">Duration</div>
-        <div class="pass__value">${formatDuration(pass.duration)}</div>
-      </div>
-      <div>
-        <div class="pass__label">Brightness</div>
-        <div class="pass__value">${pass.brightness}</div>
-      </div>
-    `;
-    const shareButton = container.querySelector('[data-share]');
-    const remindButton = container.querySelector('[data-remind]');
+  const displayPasses = getDisplayPasses();
+  const totalPages = Math.ceil(displayPasses.length / PASSES_PER_PAGE);
 
-    shareButton.addEventListener('click', async () => {
-      const shareUrl = buildShareUrl(pass);
-      if (navigator.share) {
-        try {
-          await navigator.share({
-            title: 'ISS pass details',
-            text: `Next ISS pass over ${state.locationName}`,
-            url: shareUrl
-          });
-        } catch {
-          // User cancelled share dialog
-        }
-      } else {
-        try {
-          await navigator.clipboard.writeText(shareUrl);
-          elements.locationFeedback.textContent =
-            'Share link copied to clipboard.';
-        } catch {
-          elements.locationFeedback.textContent =
-            'Unable to copy link.';
-        }
+  // Clamp current page
+  if (passPage >= totalPages) passPage = Math.max(0, totalPages - 1);
+
+  const start = passPage * PASSES_PER_PAGE;
+  const pagePasses = displayPasses.slice(start, start + PASSES_PER_PAGE);
+
+  pagePasses.forEach((pass) => {
+    elements.passes.appendChild(renderPassCard(pass));
+  });
+
+  // Add pagination controls if more than one page
+  if (totalPages > 1) {
+    const nav = document.createElement('div');
+    nav.className = 'passes__nav';
+    nav.innerHTML = `
+      <button class="passes__nav-btn" data-page="prev" ${passPage === 0 ? 'disabled' : ''} aria-label="Previous passes">&lsaquo;</button>
+      <span class="passes__nav-info">${passPage + 1} / ${totalPages}</span>
+      <button class="passes__nav-btn" data-page="next" ${passPage >= totalPages - 1 ? 'disabled' : ''} aria-label="Next passes">&rsaquo;</button>
+    `;
+    nav.querySelector('[data-page="prev"]').addEventListener('click', () => {
+      if (passPage > 0) {
+        passPage--;
+        renderPasses();
       }
     });
-
-    remindButton.addEventListener('click', () => {
-      const ics = createICS(pass);
-      const blob = new Blob([ics], { type: 'text/calendar' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `iss-pass-${pass.start.toISOString().slice(0, 10)}.ics`;
-      link.click();
-      URL.revokeObjectURL(url);
+    nav.querySelector('[data-page="next"]').addEventListener('click', () => {
+      if (passPage < totalPages - 1) {
+        passPage++;
+        renderPasses();
+      }
     });
-
-    elements.passes.appendChild(container);
-  });
+    elements.passes.appendChild(nav);
+  }
 };
 
 const updateNextPass = () => {
@@ -616,6 +689,7 @@ const updateLoop = () => {
 const recalcPasses = () => {
   if (!state.satrec) return;
   state.passes = computePasses(state.satrec, state.observer);
+  passPage = 0;
   updateNextPass();
   renderTopPicks();
   renderPasses();
@@ -687,10 +761,14 @@ const searchLocation = async (query) => {
 const bindEvents = () => {
   // Settings dropdown toggle
   const settingsToggle = document.querySelector('#settings-toggle');
+  const settingsPanel = document.querySelector('.settings-dropdown');
   if (settingsToggle) {
+    // Ensure it starts expanded with class fallback
+    if (settingsPanel) settingsPanel.classList.add('is-open');
     settingsToggle.addEventListener('click', () => {
       const expanded = settingsToggle.getAttribute('aria-expanded') === 'true';
       settingsToggle.setAttribute('aria-expanded', String(!expanded));
+      if (settingsPanel) settingsPanel.classList.toggle('is-open');
     });
   }
 
@@ -810,6 +888,24 @@ const bindEvents = () => {
       1500
     );
   });
+
+  // Globe zoom controls
+  const zoomIn = document.querySelector('#globe-zoom-in');
+  const zoomOut = document.querySelector('#globe-zoom-out');
+  if (zoomIn) {
+    zoomIn.addEventListener('click', () => {
+      if (!globe) return;
+      const pov = globe.pointOfView();
+      globe.pointOfView({ ...pov, altitude: Math.max(0.4, pov.altitude * 0.65) }, 400);
+    });
+  }
+  if (zoomOut) {
+    zoomOut.addEventListener('click', () => {
+      if (!globe) return;
+      const pov = globe.pointOfView();
+      globe.pointOfView({ ...pov, altitude: Math.min(6, pov.altitude * 1.5) }, 400);
+    });
+  }
 
   elements.settingUnits.addEventListener('change', (event) => {
     state.settings.units = event.target.value;
