@@ -108,6 +108,49 @@
       </header>
 
       <main>
+        <section class="panel settings-dropdown" aria-labelledby="settings-heading">
+          <button class="settings-dropdown__toggle" id="settings-toggle" type="button" aria-expanded="false" aria-controls="settings-content">
+            <h2 id="settings-heading" class="section-title">SETTINGS</h2>
+            <svg class="settings-dropdown__chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <div class="settings-dropdown__content" id="settings-content">
+            <div class="settings__grid">
+              <label class="field">
+                <span>Units</span>
+                <select id="setting-units">
+                  <option value="metric">Metric (km, km/s)</option>
+                  <option value="imperial">Imperial (mi, mph)</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Update rate</span>
+                <select id="setting-rate">
+                  <option value="1000">1 sec</option>
+                  <option value="5000">5 sec</option>
+                  <option value="10000">10 sec</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Time format</span>
+                <select id="setting-time">
+                  <option value="24">24 hour</option>
+                  <option value="12">12 hour</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Default view</span>
+                <select id="setting-view">
+                  <option value="both">2D + 3D</option>
+                  <option value="map">2D map only</option>
+                  <option value="globe">3D globe only</option>
+                </select>
+              </label>
+            </div>
+          </div>
+        </section>
+
         <section class="panel location-panel" aria-labelledby="location-heading">
           <div class="panel__header">
             <h2 id="location-heading" class="section-title">LOCATION</h2>
@@ -170,44 +213,6 @@
           <div id="passes" class="passes"></div>
         </section>
 
-        <section class="panel settings" aria-labelledby="settings-heading">
-          <div class="panel__header">
-            <h2 id="settings-heading" class="section-title">SETTINGS</h2>
-            <p class="section-description">Customize units, refresh speed, and time format.</p>
-          </div>
-          <div class="settings__grid">
-            <label class="field">
-              <span>Units</span>
-              <select id="setting-units">
-                <option value="metric">Metric (km, km/s)</option>
-                <option value="imperial">Imperial (mi, mph)</option>
-              </select>
-            </label>
-            <label class="field">
-              <span>Update rate</span>
-              <select id="setting-rate">
-                <option value="1000">1 sec</option>
-                <option value="5000">5 sec</option>
-                <option value="10000">10 sec</option>
-              </select>
-            </label>
-            <label class="field">
-              <span>Time format</span>
-              <select id="setting-time">
-                <option value="24">24 hour</option>
-                <option value="12">12 hour</option>
-              </select>
-            </label>
-            <label class="field">
-              <span>Default view</span>
-              <select id="setting-view">
-                <option value="both">2D + 3D</option>
-                <option value="map">2D map only</option>
-                <option value="globe">3D globe only</option>
-              </select>
-            </label>
-          </div>
-        </section>
       </main>
 
       <footer class="footer">
