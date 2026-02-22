@@ -1,0 +1,25 @@
+{
+  "name": "ISS Observer — VASEY/SPACE",
+  "short_name": "ISS Observer",
+  "description": "Real-time ISS tracking, pass predictions, and viewing recommendations.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f0f2f5",
+  "theme_color": "#111827",
+  "orientation": "portrait-primary",
+  "categories": ["education", "utilities"],
+  "icons": [
+    {
+      "src": "/iss-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

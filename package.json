@@ -1,9 +1,9 @@
 {
-  "name": "vasey-space-iss-tracker",
+  "name": "iss-observer",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
-  "description": "Real-time ISS tracking with 2D/3D visualization, pass predictions, and viewing recommendations",
+  "description": "Real-time ISS tracking PWA with pass predictions, visibility analysis, and synchronized 2D/3D visualization",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -21,7 +21,8 @@
     "space-station",
     "satellite-tracking",
     "orbital-mechanics",
-    "visualization"
+    "visualization",
+    "pwa"
   ],
   "dependencies": {
     "@vercel/analytics": "^1.6.1",

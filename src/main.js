@@ -48,6 +48,7 @@ const elements = {
   issStatus: document.querySelector('#iss-status'),
   nextPass: document.querySelector('#next-pass'),
   visibilityState: document.querySelector('#visibility-state'),
+  countdown: document.querySelector('#countdown'),
   topPicks: document.querySelector('#top-picks'),
   passes: document.querySelector('#passes'),
   locationSearch: document.querySelector('#location-search'),
@@ -67,59 +68,53 @@ const elements = {
 
 let map;
 let issMarker;
+let userMarker;
 let trackLine;
+let futureTrackLine;
 let terminatorLayer;
 let globe;
 let light;
 let lastTerminatorUpdate = 0;
 let lastTrackUpdate = 0;
 let cachedTrack = [];
+let cachedFutureTrack = [];
 
-// NASA ISS Icon SVG - Orange/White contrasting design
+// Monochrome ISS Icon SVG for map marker
 const issIconSvg = `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32">
-  <!-- Main body - central module -->
-  <rect x="24" y="28" width="16" height="8" rx="2" fill="#ff6b2c" stroke="#fff" stroke-width="1"/>
-
-  <!-- Solar panel left -->
+  <defs>
+    <linearGradient id="mBody" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#2d2d2d"/>
+      <stop offset="100%" style="stop-color:#111"/>
+    </linearGradient>
+  </defs>
+  <rect x="24" y="28" width="16" height="8" rx="2" fill="url(#mBody)" stroke="#888" stroke-width="0.8"/>
   <g transform="rotate(-5 20 32)">
-    <rect x="2" y="26" width="18" height="12" rx="1" fill="#1a1a2e" stroke="#ff6b2c" stroke-width="1.5"/>
-    <line x1="5" y1="26" x2="5" y2="38" stroke="#ff6b2c" stroke-width="0.5" opacity="0.7"/>
-    <line x1="8" y1="26" x2="8" y2="38" stroke="#ff6b2c" stroke-width="0.5" opacity="0.7"/>
-    <line x1="11" y1="26" x2="11" y2="38" stroke="#ff6b2c" stroke-width="0.5" opacity="0.7"/>
-    <line x1="14" y1="26" x2="14" y2="38" stroke="#ff6b2c" stroke-width="0.5" opacity="0.7"/>
-    <line x1="17" y1="26" x2="17" y2="38" stroke="#ff6b2c" stroke-width="0.5" opacity="0.7"/>
+    <rect x="2" y="26" width="18" height="12" rx="1" fill="#222" stroke="#666" stroke-width="1"/>
+    <line x1="5" y1="26" x2="5" y2="38" stroke="#555" stroke-width="0.4" opacity="0.7"/>
+    <line x1="8" y1="26" x2="8" y2="38" stroke="#555" stroke-width="0.4" opacity="0.7"/>
+    <line x1="11" y1="26" x2="11" y2="38" stroke="#555" stroke-width="0.4" opacity="0.7"/>
+    <line x1="14" y1="26" x2="14" y2="38" stroke="#555" stroke-width="0.4" opacity="0.7"/>
+    <line x1="17" y1="26" x2="17" y2="38" stroke="#555" stroke-width="0.4" opacity="0.7"/>
   </g>
-
-  <!-- Solar panel right -->
   <g transform="rotate(5 44 32)">
-    <rect x="44" y="26" width="18" height="12" rx="1" fill="#1a1a2e" stroke="#ff6b2c" stroke-width="1.5"/>
-    <line x1="47" y1="26" x2="47" y2="38" stroke="#ff6b2c" stroke-width="0.5" opacity="0.7"/>
-    <line x1="50" y1="26" x2="50" y2="38" stroke="#ff6b2c" stroke-width="0.5" opacity="0.7"/>
-    <line x1="53" y1="26" x2="53" y2="38" stroke="#ff6b2c" stroke-width="0.5" opacity="0.7"/>
-    <line x1="56" y1="26" x2="56" y2="38" stroke="#ff6b2c" stroke-width="0.5" opacity="0.7"/>
-    <line x1="59" y1="26" x2="59" y2="38" stroke="#ff6b2c" stroke-width="0.5" opacity="0.7"/>
+    <rect x="44" y="26" width="18" height="12" rx="1" fill="#222" stroke="#666" stroke-width="1"/>
+    <line x1="47" y1="26" x2="47" y2="38" stroke="#555" stroke-width="0.4" opacity="0.7"/>
+    <line x1="50" y1="26" x2="50" y2="38" stroke="#555" stroke-width="0.4" opacity="0.7"/>
+    <line x1="53" y1="26" x2="53" y2="38" stroke="#555" stroke-width="0.4" opacity="0.7"/>
+    <line x1="56" y1="26" x2="56" y2="38" stroke="#555" stroke-width="0.4" opacity="0.7"/>
+    <line x1="59" y1="26" x2="59" y2="38" stroke="#555" stroke-width="0.4" opacity="0.7"/>
   </g>
-
-  <!-- Truss structure -->
-  <rect x="20" y="30" width="24" height="4" fill="#722f37" stroke="#fff" stroke-width="0.5"/>
-
-  <!-- Modules -->
-  <ellipse cx="32" cy="32" rx="4" ry="3" fill="#fff" stroke="#ff6b2c" stroke-width="1"/>
-  <circle cx="28" cy="32" r="2" fill="#ff6b2c" opacity="0.9"/>
-  <circle cx="36" cy="32" r="2" fill="#ff6b2c" opacity="0.9"/>
-
-  <!-- Radiators -->
-  <rect x="22" y="20" width="3" height="6" fill="#fff" opacity="0.8"/>
-  <rect x="39" y="20" width="3" height="6" fill="#fff" opacity="0.8"/>
-  <rect x="22" y="38" width="3" height="6" fill="#fff" opacity="0.8"/>
-  <rect x="39" y="38" width="3" height="6" fill="#fff" opacity="0.8"/>
-
-  <!-- Glow effect -->
-  <ellipse cx="32" cy="32" rx="8" ry="6" fill="none" stroke="#ff6b2c" stroke-width="0.5" opacity="0.5">
-    <animate attributeName="opacity" values="0.3;0.7;0.3" dur="2s" repeatCount="indefinite"/>
-    <animate attributeName="rx" values="8;10;8" dur="2s" repeatCount="indefinite"/>
-    <animate attributeName="ry" values="6;8;6" dur="2s" repeatCount="indefinite"/>
+  <rect x="20" y="30" width="24" height="4" fill="#333" stroke="#555" stroke-width="0.5"/>
+  <ellipse cx="32" cy="32" rx="4" ry="3" fill="#eee" stroke="#999" stroke-width="0.5"/>
+  <circle cx="28" cy="32" r="2" fill="#333" opacity="0.9"/>
+  <circle cx="36" cy="32" r="2" fill="#333" opacity="0.9"/>
+  <rect x="22" y="20" width="3" height="6" fill="#ddd" opacity="0.8"/>
+  <rect x="39" y="20" width="3" height="6" fill="#ddd" opacity="0.8"/>
+  <rect x="22" y="38" width="3" height="6" fill="#ddd" opacity="0.8"/>
+  <rect x="39" y="38" width="3" height="6" fill="#ddd" opacity="0.8"/>
+  <ellipse cx="32" cy="32" rx="8" ry="6" fill="none" stroke="#999" stroke-width="0.5" opacity="0.3">
+    <animate attributeName="opacity" values="0.2;0.5;0.2" dur="3s" repeatCount="indefinite"/>
   </ellipse>
 </svg>`;
 
@@ -133,6 +128,16 @@ const createIssIcon = () => {
   });
 };
 
+// User location marker
+const createUserIcon = () => {
+  return L.divIcon({
+    className: 'user-marker',
+    html: `<div style="width:12px;height:12px;background:#111827;border:2px solid #fff;border-radius:50%;box-shadow:0 0 6px rgba(0,0,0,0.3);"></div>`,
+    iconSize: [12, 12],
+    iconAnchor: [6, 6]
+  });
+};
+
 const createTerminator = () => L.terminator();
 
 const initVisualization = () => {
@@ -143,33 +148,39 @@ const initVisualization = () => {
     zoomAnimation: true
   }).setView([state.observer.lat, state.observer.lon], 2);
 
-  // Use dark-themed map tiles for better contrast
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  // Light-themed map tiles for monochrome aesthetic
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
     attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
     subdomains: 'abcd',
     maxZoom: 19
   }).addTo(map);
 
-  // Use custom ISS icon marker
+  // ISS marker
   issMarker = L.marker([0, 0], {
     icon: createIssIcon(),
     zIndexOffset: 1000
   }).addTo(map);
 
-  // Enhanced ground track with gradient effect
+  // User location marker
+  userMarker = L.marker([state.observer.lat, state.observer.lon], {
+    icon: createUserIcon(),
+    zIndexOffset: 500
+  }).addTo(map);
+
+  // Ground track (past)
   trackLine = L.polyline([], {
-    color: '#ff6b2c',
+    color: '#333',
     weight: 2,
-    opacity: 0.8,
+    opacity: 0.7,
     smoothFactor: 1,
     className: 'iss-track'
   }).addTo(map);
 
-  // Add future track (lighter)
-  const futureTrack = L.polyline([], {
-    color: '#722f37',
+  // Future track
+  futureTrackLine = L.polyline([], {
+    color: '#999',
     weight: 1.5,
-    opacity: 0.5,
+    opacity: 0.4,
     dashArray: '5, 10',
     className: 'iss-track-future'
   }).addTo(map);
@@ -180,61 +191,62 @@ const initVisualization = () => {
   const globeContainer = document.getElementById('globe');
   globe = Globe()(globeContainer)
     .globeImageUrl(
-      'https://unpkg.com/three-globe/example/img/earth-night.jpg'
+      'https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg'
     )
     .bumpImageUrl(
       'https://unpkg.com/three-globe/example/img/earth-topology.png'
     )
-    .backgroundColor('#0b0d11')
+    .backgroundColor('#f0f2f5')
     .showAtmosphere(true)
-    .atmosphereColor('#ff6b2c')
-    .atmosphereAltitude(0.2)
+    .atmosphereColor('#aaaaaa')
+    .atmosphereAltitude(0.18)
     .pointAltitude(0.025)
-    .pointColor(() => '#ff6b2c')
+    .pointColor(() => '#111827')
     .pointRadius(0.5)
-    .pathColor(() => ['#ff6b2c', '#722f37'])
+    .pathColor(() => ['#333', '#999'])
     .pathStroke(2)
     .pathPointAlt(() => 0.015)
     .pathTransitionDuration(0);
 
-  // Enhanced controls for smoother interaction
+  // Smooth controls
   globe.controls().enableDamping = true;
   globe.controls().dampingFactor = 0.1;
   globe.controls().rotateSpeed = 0.5;
   globe.controls().zoomSpeed = 0.8;
   globe.controls().autoRotate = false;
 
-  // Add ambient light for better visibility
-  const ambientLight = new THREE.AmbientLight('#ffffff', 0.3);
+  // Lighting for the globe
+  const ambientLight = new THREE.AmbientLight('#ffffff', 0.6);
   globe.scene().add(ambientLight);
 
-  // Main directional light (sun)
-  light = new THREE.DirectionalLight('#ffffff', 1.5);
+  light = new THREE.DirectionalLight('#ffffff', 1.2);
   light.position.set(1, 1, 1);
   globe.scene().add(light);
 
-  // Add subtle point light at ISS position for glow effect
-  const issGlow = new THREE.PointLight('#ff6b2c', 0.5, 50);
+  // ISS glow on globe
+  const issGlow = new THREE.PointLight('#444444', 0.4, 50);
   issGlow.position.set(0, 0, 1.02);
   globe.scene().add(issGlow);
-
-  // Store glow reference for updates
   globe._issGlow = issGlow;
 };
 
 const loadSettings = () => {
-  const saved = localStorage.getItem('vasey-settings');
-  if (!saved) return;
   try {
+    const saved = localStorage.getItem('vasey-settings');
+    if (!saved) return;
     const parsed = JSON.parse(saved);
     state.settings = { ...state.settings, ...parsed };
-  } catch (error) {
-    console.warn('Unable to load settings', error);
+  } catch {
+    // localStorage unavailable or corrupt - use defaults
   }
 };
 
 const persistSettings = () => {
-  localStorage.setItem('vasey-settings', JSON.stringify(state.settings));
+  try {
+    localStorage.setItem('vasey-settings', JSON.stringify(state.settings));
+  } catch {
+    // localStorage unavailable - settings won't persist
+  }
 };
 
 const applySettings = () => {
@@ -278,12 +290,36 @@ const updateStatusPanel = (position) => {
   const lon = formatCoord(position.lon, 'E', 'W');
   const altitude = formatAltitude(position.altitude, state.settings.units);
   const speed = formatSpeed(position.speed, state.settings.units);
-  elements.issStatus.textContent = `${lat}, ${lon} • ${altitude} • ${speed}`;
+  elements.issStatus.textContent = `${lat}, ${lon} | ${altitude} | ${speed}`;
+};
+
+const updateCountdown = () => {
+  if (!state.passes.length) {
+    elements.countdown.textContent = '--';
+    return;
+  }
+  const now = new Date();
+  // Find next upcoming pass
+  const next = state.passes.find((pass) => pass.start > now);
+  if (!next) {
+    elements.countdown.textContent = 'No upcoming passes';
+    return;
+  }
+  const diff = next.start - now;
+  const hours = Math.floor(diff / 3600000);
+  const minutes = Math.floor((diff % 3600000) / 60000);
+  const seconds = Math.floor((diff % 60000) / 1000);
+
+  if (hours > 0) {
+    elements.countdown.textContent = `${hours}h ${minutes}m ${seconds}s`;
+  } else {
+    elements.countdown.textContent = `${minutes}m ${seconds}s`;
+  }
 };
 
 const updateVisibilityNow = () => {
   if (!state.passes.length) {
-    elements.visibilityState.textContent = '—';
+    elements.visibilityState.textContent = '--';
     return;
   }
   const now = new Date();
@@ -291,10 +327,23 @@ const updateVisibilityNow = () => {
     (pass) => now >= pass.start && now <= pass.end
   );
   if (!active) {
-    elements.visibilityState.textContent = 'Below your horizon';
+    // Check if a visible pass is coming up
+    const nextVisible = state.passes.find(
+      (pass) => pass.visible && pass.start > now
+    );
+    if (nextVisible) {
+      const diffHours = (nextVisible.start - now) / 3600000;
+      if (diffHours < 1) {
+        elements.visibilityState.textContent = 'Visible pass approaching';
+      } else {
+        elements.visibilityState.textContent = 'Below your horizon';
+      }
+    } else {
+      elements.visibilityState.textContent = 'Below your horizon';
+    }
   } else {
     elements.visibilityState.textContent =
-      active.visible ? 'Visible in dark skies' : 'Overhead but not visible';
+      active.visible ? 'VISIBLE NOW — Look up!' : 'Overhead but not visible';
   }
 };
 
@@ -307,7 +356,7 @@ const renderTopPicks = () => {
 
   if (!picks.length) {
     elements.topPicks.innerHTML =
-      '<div class="card"><p class="card__title">No visible passes in the next 72 hours.</p><p class="card__meta">Try adjusting your location or check back later.</p></div>';
+      '<div class="card"><p class="card__title">No visible passes in the next 72 hours.</p><p class="card__meta">Try adjusting your location or check back later. Visibility requires dark skies at your location and a sunlit ISS.</p></div>';
     return;
   }
 
@@ -315,14 +364,14 @@ const renderTopPicks = () => {
     const card = document.createElement('div');
     card.className = 'card';
     card.innerHTML = `
-      <div class="badge">Score ${pass.score}</div>
+      <div class="badge badge--score">Score ${pass.score}</div>
       <p class="card__title">${formatDateTime(
         pass.start,
         state.settings.timeFormat
       )}</p>
       <p class="card__meta">Peak ${pass.maxElevation.toFixed(
         0
-      )}° • ${formatDuration(pass.duration)} • ${pass.brightness}</p>
+      )}° | ${formatDuration(pass.duration)} | ${pass.brightness}</p>
     `;
     elements.topPicks.appendChild(card);
   });
@@ -342,12 +391,12 @@ const createICS = (pass) => {
   return [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//VASEY/SPACE//ISS Tracker//EN',
+    'PRODID:-//VASEY/SPACE//ISS Observer//EN',
     'BEGIN:VEVENT',
     `DTSTART:${start}`,
     `DTEND:${end}`,
     `SUMMARY:ISS pass over ${state.locationName}`,
-    `DESCRIPTION:Peak elevation ${pass.maxElevation.toFixed(0)}° — ${pass.brightness}.`,
+    `DESCRIPTION:Peak elevation ${pass.maxElevation.toFixed(0)}° — ${pass.brightness}. Look ${formatAzimuth(pass.startAz)} to start.`,
     'END:VEVENT',
     'END:VCALENDAR'
   ].join('\n');
@@ -357,20 +406,20 @@ const renderPasses = () => {
   elements.passes.innerHTML = '';
   if (!state.passes.length) {
     elements.passes.innerHTML =
-      '<div class="card"><p class="card__title">No passes available yet.</p><p class="card__meta">Update your location or try again in a moment.</p></div>';
+      '<div class="card"><p class="card__title">No passes available yet.</p><p class="card__meta">Update your location or wait for orbital data to load.</p></div>';
     return;
   }
 
   state.passes.slice(0, 12).forEach((pass) => {
     const container = document.createElement('div');
-    container.className = 'pass';
+    container.className = `pass${pass.visible ? ' pass--visible' : ''}`;
     const directionLabel = `${formatAzimuth(pass.startAz)} → ${formatAzimuth(
       pass.endAz
     )}`;
     container.innerHTML = `
       <div class="pass__header">
         <div>
-          <div class="badge">${pass.visible ? 'Visible' : 'Overhead'}</div>
+          <div class="badge${pass.visible ? ' badge--visible' : ''}">${pass.visible ? 'Visible' : 'Overhead'}</div>
           <p class="card__title">${formatDateTime(
             pass.start,
             state.settings.timeFormat
@@ -378,8 +427,8 @@ const renderPasses = () => {
           <p class="card__meta">${describeVisibility(pass)}</p>
         </div>
         <div class="pass__actions">
-          <button class="button" data-share>Share</button>
-          <button class="button" data-remind>Reminder</button>
+          <button class="button button--small" data-share>Share</button>
+          <button class="button button--small" data-remind>Reminder</button>
         </div>
       </div>
       <div>
@@ -394,7 +443,7 @@ const renderPasses = () => {
         <div class="pass__value">${formatTime(
           pass.peakTime,
           state.settings.timeFormat
-        )} • ${pass.maxElevation.toFixed(0)}°</div>
+        )} | ${pass.maxElevation.toFixed(0)}°</div>
       </div>
       <div>
         <div class="pass__label">End</div>
@@ -422,11 +471,15 @@ const renderPasses = () => {
     shareButton.addEventListener('click', async () => {
       const shareUrl = buildShareUrl(pass);
       if (navigator.share) {
-        await navigator.share({
-          title: 'ISS pass details',
-          text: `Next ISS pass over ${state.locationName}`,
-          url: shareUrl
-        });
+        try {
+          await navigator.share({
+            title: 'ISS pass details',
+            text: `Next ISS pass over ${state.locationName}`,
+            url: shareUrl
+          });
+        } catch {
+          // User cancelled share dialog
+        }
       } else {
         try {
           await navigator.clipboard.writeText(shareUrl);
@@ -434,7 +487,7 @@ const renderPasses = () => {
             'Share link copied to clipboard.';
         } catch {
           elements.locationFeedback.textContent =
-            'Unable to copy link. Share manually: ' + shareUrl;
+            'Unable to copy link.';
         }
       }
     });
@@ -445,7 +498,7 @@ const renderPasses = () => {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `iss-pass-${pass.start.toISOString()}.ics`;
+      link.download = `iss-pass-${pass.start.toISOString().slice(0, 10)}.ics`;
       link.click();
       URL.revokeObjectURL(url);
     });
@@ -459,27 +512,51 @@ const updateNextPass = () => {
     elements.nextPass.textContent = 'No passes available yet.';
     return;
   }
-  const next = state.passes[0];
-  elements.nextPass.textContent = `${formatDateTime(
-    next.start,
-    state.settings.timeFormat
-  )} • ${next.maxElevation.toFixed(0)}° peak`;
+  const now = new Date();
+  // Find next visible pass specifically
+  const nextVisible = state.passes.find(
+    (pass) => pass.visible && pass.start > now
+  );
+  if (nextVisible) {
+    elements.nextPass.textContent = `${formatDateTime(
+      nextVisible.start,
+      state.settings.timeFormat
+    )} | ${nextVisible.maxElevation.toFixed(0)}° peak`;
+  } else {
+    // Show next pass even if not visible
+    const next = state.passes.find((pass) => pass.start > now);
+    if (next) {
+      elements.nextPass.textContent = `${formatDateTime(
+        next.start,
+        state.settings.timeFormat
+      )} (not visible)`;
+    } else {
+      elements.nextPass.textContent = 'No upcoming passes';
+    }
+  }
 };
 
 const updateMapAndGlobe = (position) => {
   if (!position) return;
 
-  // Smooth marker update on 2D map
+  // Update ISS marker
   issMarker.setLatLng([position.lat, position.lon]);
 
-  // Update ground track every 60 seconds
+  // Update ground tracks every 60 seconds
   if (Date.now() - lastTrackUpdate > 60 * 1000) {
+    // Past track (90 minutes)
     cachedTrack = computeGroundTrack(state.satrec, new Date(), 90, 60);
     trackLine.setLatLngs(cachedTrack.map((point) => [point.lat, point.lon]));
+
+    // Future track (45 minutes ahead)
+    const futureStart = new Date();
+    cachedFutureTrack = computeGroundTrack(state.satrec, futureStart, 45, 60);
+    futureTrackLine.setLatLngs(cachedFutureTrack.map((point) => [point.lat, point.lon]));
+
     lastTrackUpdate = Date.now();
   }
 
-  // Update terminator (day/night) every 5 minutes
+  // Update terminator every 5 minutes
   if (Date.now() - lastTerminatorUpdate > 5 * 60 * 1000) {
     terminatorLayer.remove();
     terminatorLayer = createTerminator();
@@ -487,15 +564,14 @@ const updateMapAndGlobe = (position) => {
     lastTerminatorUpdate = Date.now();
   }
 
-  // Update 3D globe ISS position with smooth transition
+  // Update 3D globe
   globe.pointsData([{
     lat: position.lat,
     lng: position.lon,
     altitude: 0.025,
-    color: '#ff6b2c'
+    color: '#111827'
   }]);
 
-  // Update ground track on globe
   globe.pathsData([
     {
       path: cachedTrack.map((point) => ({
@@ -524,6 +600,9 @@ const updateLoop = () => {
   updateStatusPanel(position);
   updateMapAndGlobe(position);
   updateVisibilityNow();
+  updateCountdown();
+
+  // Update sun position on globe
   const sun = getSunSubPoint(new Date());
   const phi = THREE.MathUtils.degToRad(90 - sun.lat);
   const theta = THREE.MathUtils.degToRad(sun.lon + 180);
@@ -541,25 +620,42 @@ const recalcPasses = () => {
   renderTopPicks();
   renderPasses();
   updateVisibilityNow();
+  updateCountdown();
 };
 
 const applyLocation = async (lat, lon, name = '') => {
+  // Validate coordinates
+  if (lat < -90 || lat > 90 || lon < -180 || lon > 180) {
+    elements.locationFeedback.textContent = 'Coordinates out of valid range.';
+    return;
+  }
+
   state.observer.lat = lat;
   state.observer.lon = lon;
   state.locationName = name || 'Custom location';
-  localStorage.setItem(
-    'vasey-location',
-    JSON.stringify({ lat, lon, name: state.locationName })
-  );
+
+  try {
+    localStorage.setItem(
+      'vasey-location',
+      JSON.stringify({ lat, lon, name: state.locationName })
+    );
+  } catch {
+    // localStorage unavailable
+  }
+
+  // Update user marker
+  userMarker.setLatLng([lat, lon]);
+
   // Smooth fly-to animation
   map.flyTo([lat, lon], 3, {
     duration: 1.5,
     easeLinearity: 0.25
   });
-  // Also update globe view
+
   if (globe) {
     globe.pointOfView({ lat, lng: lon, altitude: 2.5 }, 1500);
   }
+
   updateLocationInputs();
   recalcPasses();
   elements.locationFeedback.textContent = `Location set to ${state.locationName}.`;
@@ -568,7 +664,8 @@ const applyLocation = async (lat, lon, name = '') => {
 const searchLocation = async (query) => {
   const params = new URLSearchParams({
     format: 'json',
-    q: query
+    q: query.trim(),
+    limit: '1'
   });
   const email = window.VASEY_CONFIG?.nominatimEmail;
   if (email) {
@@ -582,7 +679,7 @@ const searchLocation = async (query) => {
   }
   const results = await response.json();
   if (!results.length) {
-    throw new Error('No results found.');
+    throw new Error('No results found for that location.');
   }
   return results[0];
 };
@@ -596,25 +693,50 @@ const bindEvents = () => {
       map.invalidateSize();
     }
   });
+
+  // Clean up on page unload
+  window.addEventListener('beforeunload', () => {
+    if (loopId) {
+      clearInterval(loopId);
+    }
+  });
+
   elements.useLocation.addEventListener('click', () => {
-    elements.locationFeedback.textContent = 'Requesting location permission…';
+    if (!navigator.geolocation) {
+      elements.locationFeedback.textContent = 'Geolocation is not supported by your browser.';
+      return;
+    }
+    elements.locationFeedback.textContent = 'Requesting location permission...';
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
         applyLocation(latitude, longitude, 'My location');
       },
-      () => {
-        elements.locationFeedback.textContent =
-          'Unable to access location. Enter coordinates manually.';
-      }
+      (error) => {
+        if (error.code === error.PERMISSION_DENIED) {
+          elements.locationFeedback.textContent =
+            'Location permission denied. Enter coordinates manually.';
+        } else {
+          elements.locationFeedback.textContent =
+            'Unable to determine location. Enter coordinates manually.';
+        }
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
     );
+  });
+
+  // Support Enter key on search field
+  elements.locationSearch.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      elements.applyLocation.click();
+    }
   });
 
   elements.applyLocation.addEventListener('click', async () => {
     try {
       if (elements.locationSearch.value.trim()) {
-        elements.locationFeedback.textContent = 'Searching…';
-        const result = await searchLocation(elements.locationSearch.value.trim());
+        elements.locationFeedback.textContent = 'Searching...';
+        const result = await searchLocation(elements.locationSearch.value);
         await applyLocation(
           parseFloat(result.lat),
           parseFloat(result.lon),
@@ -625,6 +747,12 @@ const bindEvents = () => {
         const lon = parseFloat(elements.locationLon.value);
         if (Number.isNaN(lat) || Number.isNaN(lon)) {
           throw new Error('Enter valid coordinates.');
+        }
+        if (lat < -90 || lat > 90) {
+          throw new Error('Latitude must be between -90 and 90.');
+        }
+        if (lon < -180 || lon > 180) {
+          throw new Error('Longitude must be between -180 and 180.');
         }
         await applyLocation(lat, lon, 'Custom coordinates');
       }
@@ -648,12 +776,10 @@ const bindEvents = () => {
   elements.centerIss.addEventListener('click', () => {
     const position = computePosition(state.satrec, new Date());
     if (position) {
-      // Smooth fly-to animation on 2D map
       map.flyTo([position.lat, position.lon], 3, {
         duration: 1.5,
         easeLinearity: 0.25
       });
-      // Smooth transition on 3D globe
       globe.pointOfView(
         { lat: position.lat, lng: position.lon, altitude: 2 },
         1500
@@ -662,12 +788,10 @@ const bindEvents = () => {
   });
 
   elements.centerUser.addEventListener('click', () => {
-    // Smooth fly-to animation on 2D map
     map.flyTo([state.observer.lat, state.observer.lon], 4, {
       duration: 1.5,
       easeLinearity: 0.25
     });
-    // Smooth transition on 3D globe
     globe.pointOfView(
       {
         lat: state.observer.lat,
@@ -720,47 +844,78 @@ const hydrateFromUrl = () => {
   const lat = params.get('lat');
   const lon = params.get('lon');
   if (lat && lon) {
-    state.observer.lat = parseFloat(lat);
-    state.observer.lon = parseFloat(lon);
+    const parsedLat = parseFloat(lat);
+    const parsedLon = parseFloat(lon);
+    if (!Number.isNaN(parsedLat) && !Number.isNaN(parsedLon)) {
+      state.observer.lat = parsedLat;
+      state.observer.lon = parsedLon;
+    }
+  }
+};
+
+// Register service worker for PWA
+const registerServiceWorker = async () => {
+  if ('serviceWorker' in navigator) {
+    try {
+      await navigator.serviceWorker.register('/sw.js');
+    } catch {
+      // Service worker registration failed - app still works without it
+    }
   }
 };
 
 const init = async () => {
-  // Libraries are now bundled, no need to wait for CDN loading
   elements.issStatus.textContent = 'Initializing...';
   loadSettings();
   hydrateFromUrl();
   initVisualization();
   applySettings();
   updateLocationInputs();
+
   const globeEl = document.querySelector('#globe');
   globe.width(globeEl.clientWidth);
   globe.height(globeEl.clientHeight);
 
-  const savedLocation = localStorage.getItem('vasey-location');
-  if (savedLocation) {
-    try {
+  // Load saved location
+  try {
+    const savedLocation = localStorage.getItem('vasey-location');
+    if (savedLocation) {
       const parsed = JSON.parse(savedLocation);
       state.observer.lat = parsed.lat;
       state.observer.lon = parsed.lon;
       state.locationName = parsed.name;
       map.setView([state.observer.lat, state.observer.lon], 3);
+      userMarker.setLatLng([state.observer.lat, state.observer.lon]);
       updateLocationInputs();
+    }
+  } catch {
+    // localStorage unavailable or corrupt
+  }
+
+  // Fetch TLE data with retry
+  let retries = 3;
+  while (retries > 0) {
+    try {
+      const tle = await fetchTle();
+      state.satrec = getSatrec(tle);
+      recalcPasses();
+      startLoop();
+      updateLoop();
+      break;
     } catch (error) {
-      console.warn('Unable to load saved location', error);
+      retries--;
+      if (retries > 0) {
+        elements.issStatus.textContent = `Retrying orbital data fetch...`;
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+      } else {
+        elements.issStatus.textContent = 'Unable to load ISS orbital data. Refresh to try again.';
+        elements.locationFeedback.textContent = error.message;
+      }
     }
   }
 
-  try {
-    const tle = await fetchTle();
-    state.satrec = getSatrec(tle);
-    recalcPasses();
-    startLoop();
-    updateLoop();
-  } catch (error) {
-    elements.issStatus.textContent = 'Unable to load ISS data.';
-    elements.locationFeedback.textContent = error.message;
-  }
+  // Register PWA service worker
+  registerServiceWorker();
 };
 
 bindEvents();
