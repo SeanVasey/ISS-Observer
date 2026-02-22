@@ -297,7 +297,7 @@ const updateStatusPanel = (position) => {
   const lon = formatCoord(position.lon, 'E', 'W');
   const altitude = formatAltitude(position.altitude, state.settings.units);
   const speed = formatSpeed(position.speed, state.settings.units);
-  elements.issStatus.textContent = `${lat}, ${lon} | ${altitude} | ${speed}`;
+  elements.issStatus.textContent = `${lat}, ${lon}\n${altitude}\n${speed}`;
 };
 
 const updateCountdown = () => {
@@ -646,12 +646,10 @@ const updateMapAndGlobe = (position) => {
   }]);
 
   globe.pathsData([
-    {
-      path: cachedTrack.map((point) => ({
-        lat: point.lat,
-        lng: point.lon
-      }))
-    }
+    cachedTrack.map((point) => ({
+      lat: point.lat,
+      lng: point.lon
+    }))
   ]);
 
   // Update ISS glow position on globe
@@ -762,13 +760,18 @@ const bindEvents = () => {
   // Settings dropdown toggle
   const settingsToggle = document.querySelector('#settings-toggle');
   const settingsPanel = document.querySelector('.settings-dropdown');
+  const settingsContent = document.querySelector('#settings-content');
   if (settingsToggle) {
-    // Ensure it starts expanded with class fallback
-    if (settingsPanel) settingsPanel.classList.add('is-open');
+    const isExpanded = settingsToggle.getAttribute('aria-expanded') === 'true';
+    if (settingsPanel) settingsPanel.classList.toggle('is-open', isExpanded);
+    if (settingsContent) settingsContent.hidden = !isExpanded;
+
     settingsToggle.addEventListener('click', () => {
       const expanded = settingsToggle.getAttribute('aria-expanded') === 'true';
-      settingsToggle.setAttribute('aria-expanded', String(!expanded));
-      if (settingsPanel) settingsPanel.classList.toggle('is-open');
+      const nextExpanded = !expanded;
+      settingsToggle.setAttribute('aria-expanded', String(nextExpanded));
+      if (settingsPanel) settingsPanel.classList.toggle('is-open', nextExpanded);
+      if (settingsContent) settingsContent.hidden = !nextExpanded;
     });
   }
 

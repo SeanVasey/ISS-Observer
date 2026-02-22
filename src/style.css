@@ -629,8 +629,9 @@ main {
 /* Live Status Indicator */
 .status-live {
   display: inline-flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.5rem;
+  white-space: pre-line;
 }
 
 .status-live::before {
