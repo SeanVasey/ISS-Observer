@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+- Corrected globe path data shape to prevent `points.map is not a function` runtime errors.
+- Made the settings menu collapse/expand state fully synchronized via `aria-expanded`, `hidden`, and CSS fallback class.
+- Updated ISS status formatting to display coordinates, altitude, and speed on separate lines for readability.
+
 ## [0.2.0] — 2026-02-22
 
 ### Added
