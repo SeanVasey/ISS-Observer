@@ -82,6 +82,9 @@ let passPage = 0;
 const PASSES_PER_PAGE = 5;
 const MAX_DISPLAY_PASSES = 25;
 
+// ISS orbital altitude as fraction of Earth radius for 3D globe
+const ISS_ALT_GLOBE = 0.06;
+
 // Monochrome ISS Icon SVG for map marker
 const issIconSvg = `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32">
@@ -141,7 +144,78 @@ const createUserIcon = () => {
   });
 };
 
-const createTerminator = () => terminator();
+const createTerminator = () => {
+  const t = terminator();
+  t.setStyle({
+    fillColor: '#000',
+    fillOpacity: 0.12,
+    stroke: true,
+    color: '#333',
+    weight: 0.5,
+    opacity: 0.4
+  });
+  return t;
+};
+
+/**
+ * Split a ground track into segments at antimeridian crossings
+ * to prevent Leaflet from drawing lines across the entire map.
+ */
+const segmentTrack = (points) => {
+  if (points.length < 2) return [points.map((p) => [p.lat, p.lon])];
+  const segments = [];
+  let segment = [[points[0].lat, points[0].lon]];
+  for (let i = 1; i < points.length; i++) {
+    const prevLon = points[i - 1].lon;
+    const currLon = points[i].lon;
+    // Detect antimeridian crossing (large jump > 180 degrees)
+    if (Math.abs(currLon - prevLon) > 180) {
+      segments.push(segment);
+      segment = [];
+    }
+    segment.push([points[i].lat, points[i].lon]);
+  }
+  if (segment.length) segments.push(segment);
+  return segments;
+};
+
+/**
+ * Build a 3D ISS model using Three.js primitives for the globe.
+ */
+const buildIssMesh = () => {
+  const group = new THREE.Group();
+
+  // Main body
+  const bodyGeo = new THREE.BoxGeometry(0.008, 0.004, 0.004);
+  const bodyMat = new THREE.MeshStandardMaterial({ color: '#cccccc', metalness: 0.6, roughness: 0.3 });
+  const body = new THREE.Mesh(bodyGeo, bodyMat);
+  group.add(body);
+
+  // Solar panel left
+  const panelGeo = new THREE.BoxGeometry(0.002, 0.018, 0.001);
+  const panelMat = new THREE.MeshStandardMaterial({ color: '#1a1a3a', metalness: 0.3, roughness: 0.6 });
+  const panelL = new THREE.Mesh(panelGeo, panelMat);
+  panelL.position.set(-0.006, 0, 0);
+  group.add(panelL);
+
+  // Solar panel right
+  const panelR = new THREE.Mesh(panelGeo, panelMat);
+  panelR.position.set(0.006, 0, 0);
+  group.add(panelR);
+
+  // Glow ring
+  const glowGeo = new THREE.RingGeometry(0.008, 0.012, 32);
+  const glowMat = new THREE.MeshBasicMaterial({
+    color: '#2dd4bf',
+    transparent: true,
+    opacity: 0.35,
+    side: THREE.DoubleSide
+  });
+  const glow = new THREE.Mesh(glowGeo, glowMat);
+  group.add(glow);
+
+  return group;
+};
 
 const initVisualization = () => {
   map = L.map('map', {
@@ -150,6 +224,9 @@ const initVisualization = () => {
     fadeAnimation: true,
     zoomAnimation: true
   }).setView([state.observer.lat, state.observer.lon], 2);
+
+  // Add zoom control in bottom-left to not conflict with globe controls
+  L.control.zoom({ position: 'bottomleft' }).addTo(map);
 
   // Light-themed map tiles for monochrome aesthetic
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
@@ -209,7 +286,24 @@ const initVisualization = () => {
     .pathColor(() => ['#333', '#999'])
     .pathStroke(2)
     .pathPointAlt(() => 0.015)
-    .pathTransitionDuration(0);
+    .pathTransitionDuration(0)
+    // ISS as a custom 3D object on the globe
+    .customLayerData([])
+    .customThreeObject(() => buildIssMesh())
+    .customThreeObjectUpdate((obj, d) => {
+      Object.assign(obj.position, globe.getCoords(d.lat, d.lng, d.alt));
+      // Orient the ISS model to face the camera roughly
+      obj.lookAt(globe.camera().position);
+    })
+    // HTML label for ISS
+    .htmlElementsData([])
+    .htmlElement(() => {
+      const el = document.createElement('div');
+      el.className = 'iss-3d-label';
+      el.textContent = 'ISS';
+      return el;
+    })
+    .htmlAltitude(ISS_ALT_GLOBE + 0.015);
 
   // Smooth controls
   globe.controls().enableDamping = true;
@@ -225,12 +319,6 @@ const initVisualization = () => {
   light = new THREE.DirectionalLight('#ffffff', 1.2);
   light.position.set(1, 1, 1);
   globe.scene().add(light);
-
-  // ISS glow on globe
-  const issGlow = new THREE.PointLight('#444444', 0.4, 50);
-  issGlow.position.set(0, 0, 1.02);
-  globe.scene().add(issGlow);
-  globe._issGlow = issGlow;
 };
 
 const loadSettings = () => {
@@ -266,18 +354,20 @@ const applySettings = () => {
 
 const updateViewPreference = () => {
   const view = state.settings.view;
+  const mapContainer = document.querySelector('.visualization__map-container');
+  const globeContainer = document.querySelector('.visualization__globe-container');
+  if (!map || !globe || !mapContainer || !globeContainer) return;
   const mapEl = document.querySelector('#map');
   const globeEl = document.querySelector('#globe');
-  if (!map || !globe) return;
   if (view === 'map') {
-    mapEl.style.display = 'block';
-    globeEl.style.display = 'none';
+    mapContainer.style.display = 'block';
+    globeContainer.style.display = 'none';
   } else if (view === 'globe') {
-    mapEl.style.display = 'none';
-    globeEl.style.display = 'block';
+    mapContainer.style.display = 'none';
+    globeContainer.style.display = 'block';
   } else {
-    mapEl.style.display = 'block';
-    globeEl.style.display = 'block';
+    mapContainer.style.display = 'block';
+    globeContainer.style.display = 'block';
   }
   setTimeout(() => {
     map.invalidateSize();
@@ -416,7 +506,6 @@ const getDisplayPasses = () => {
   // Prioritize visible passes: put first 2 upcoming visible at top, then
   // up to 3 more high-score visible, then fill with chronological
   const visible = upcoming.filter((p) => p.visible);
-  const nonVisible = upcoming.filter((p) => !p.visible);
 
   // First 2 upcoming visible (by time)
   const firstVisible = visible.slice(0, 2);
@@ -617,14 +706,18 @@ const updateMapAndGlobe = (position) => {
 
   // Update ground tracks every 60 seconds
   if (Date.now() - lastTrackUpdate > 60 * 1000) {
-    // Past track (90 minutes)
-    cachedTrack = computeGroundTrack(state.satrec, new Date(), 90, 60);
-    trackLine.setLatLngs(cachedTrack.map((point) => [point.lat, point.lon]));
+    // Past track (90 minutes — one full orbit)
+    cachedTrack = computeGroundTrack(state.satrec, new Date(), 90, 30);
 
-    // Future track (45 minutes ahead)
+    // Segment tracks at antimeridian crossings for correct 2D display
+    const pastSegments = segmentTrack(cachedTrack);
+    trackLine.setLatLngs(pastSegments);
+
+    // Future track (90 minutes ahead — one full orbit)
     const futureStart = new Date();
-    cachedFutureTrack = computeGroundTrack(state.satrec, futureStart, 45, 60);
-    futureTrackLine.setLatLngs(cachedFutureTrack.map((point) => [point.lat, point.lon]));
+    cachedFutureTrack = computeGroundTrack(state.satrec, futureStart, 90, 30);
+    const futureSegments = segmentTrack(cachedFutureTrack);
+    futureTrackLine.setLatLngs(futureSegments);
 
     lastTrackUpdate = Date.now();
   }
@@ -637,32 +730,43 @@ const updateMapAndGlobe = (position) => {
     lastTerminatorUpdate = Date.now();
   }
 
-  // Update 3D globe
-  globe.pointsData([{
+  // Update 3D globe — ISS as custom 3D object
+  globe.customLayerData([{
     lat: position.lat,
     lng: position.lon,
-    altitude: 0.025,
-    color: '#111827'
+    alt: ISS_ALT_GLOBE
   }]);
 
-  globe.pathsData([
-    cachedTrack.map((point) => ({
+  // ISS label
+  globe.htmlElementsData([{
+    lat: position.lat,
+    lng: position.lon,
+    alt: ISS_ALT_GLOBE + 0.015
+  }]);
+
+  // Observer point
+  globe.pointsData([{
+    lat: state.observer.lat,
+    lng: state.observer.lon,
+    altitude: 0.01,
+    color: '#14b8a6'
+  }]);
+
+  // Both past and future tracks on globe
+  const paths = [];
+  if (cachedTrack.length > 1) {
+    paths.push(cachedTrack.map((point) => ({
       lat: point.lat,
       lng: point.lon
-    }))
-  ]);
-
-  // Update ISS glow position on globe
-  if (globe._issGlow) {
-    const phi = THREE.MathUtils.degToRad(90 - position.lat);
-    const theta = THREE.MathUtils.degToRad(position.lon + 180);
-    const radius = 1.025;
-    globe._issGlow.position.set(
-      radius * Math.sin(phi) * Math.cos(theta),
-      radius * Math.cos(phi),
-      radius * Math.sin(phi) * Math.sin(theta)
-    );
+    })));
   }
+  if (cachedFutureTrack.length > 1) {
+    paths.push(cachedFutureTrack.map((point) => ({
+      lat: point.lat,
+      lng: point.lon
+    })));
+  }
+  globe.pathsData(paths);
 };
 
 const updateLoop = () => {
@@ -673,7 +777,7 @@ const updateLoop = () => {
   updateVisibilityNow();
   updateCountdown();
 
-  // Update sun position on globe
+  // Update sun position on globe for day/night lighting
   const sun = getSunSubPoint(new Date());
   const phi = THREE.MathUtils.degToRad(90 - sun.lat);
   const theta = THREE.MathUtils.degToRad(sun.lon + 180);
@@ -1030,7 +1134,7 @@ const init = async () => {
       } catch (error) {
         retries--;
         if (retries > 0) {
-          elements.issStatus.textContent = `Retrying orbital data fetch...`;
+          elements.issStatus.textContent = 'Retrying orbital data fetch...';
           await new Promise((resolve) => setTimeout(resolve, 2000));
         } else {
           elements.issStatus.textContent = 'Unable to load ISS orbital data. Refresh to try again.';

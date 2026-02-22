@@ -70,7 +70,7 @@ npm run test:watch # Run tests in watch mode
 
 ## Design System
 - **Color Scheme**: Monochrome — light backgrounds with dark text
-- **Fonts**: Bebas Neue (section titles), Sora (headings), Reddit Sans (body)
+- **Fonts**: Bebas Neue (titles, labels), Reddit Sans (body)
 - **Brand**: VASEY/SPACE
 - **Layout**: Mobile-first responsive, max-width containers
 - **Components**: Panels, cards, badges, buttons with subtle animations

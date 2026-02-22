@@ -5,16 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.3.0] — 2026-02-22
+
+### Added
+- ISS 3D model rendered directly on the globe using Three.js custom objects (body, solar panels, glow ring) with an "ISS" label overlay.
+- Globe zoom controls (+/−) positioned as an overlay on the 3D globe container so they are unambiguously associated with the globe rather than the 2D map.
+- Leaflet zoom control added to the 2D map (bottom-left position) for standard map navigation.
+- Subtle radial glow behind the hero brand lockup matching the VASEY sibling app style.
+- Antimeridian-aware ground track segmentation prevents straight-line artifacts when the orbit crosses ±180° longitude.
+- Future orbit track (90 minutes ahead) now displayed on both the 2D map and 3D globe.
+- Observer location shown as a turquoise point on the 3D globe.
+- Day/night terminator on the 2D map styled with semi-transparent fill and subtle border line.
+
+### Changed
+- Hero title uses clean black Bebas Neue text with a soft shadow glow instead of the previous turquoise text-stroke, matching the reSOURCERY visual identity.
+- Hero eyebrow spacing and sizing refined for better balance on mobile.
+- Visualization section restructured: map and globe each in their own container div for independent control placement.
+- Mobile map/globe height increased from 280px to 300px for better usability; 260px on very small screens.
+- Mobile visualization control buttons now flex-wrap horizontally instead of going full-width stacked.
+- Ground track computation interval decreased from 60s steps to 30s steps for smoother curves.
+- Both past and future tracks rendered on the 3D globe (previously only past track).
+- Globe no longer uses a separate PointLight for ISS glow; replaced by the custom 3D model's built-in glow ring.
 
 ### Fixed
 - Corrected globe path data shape to prevent `points.map is not a function` runtime errors.
 - Prevented collapsed settings fields from leaking outside the dropdown by defaulting the panel to hidden and tightening `hidden`/transition behavior.
 - Updated ISS status formatting to display coordinates, altitude, and speed on separate lines for readability.
-
-### Changed
-- Refined hero and section typography: switched headings to Bebas Neue condensed all-caps styling, standardized body copy on Reddit Sans, and removed unused Sora font loading.
-- Reworked hero brand lockup to place the ISS icon to the left of the title with centered alignment, returning a black title with a subtle cyan stroke and no glow.
+- Ground tracks now properly segment at antimeridian crossings, eliminating the horizontal line artifact that appeared when the orbit wrapped around the map.
 
 ## [0.2.0] — 2026-02-22
 
