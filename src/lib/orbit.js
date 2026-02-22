@@ -27,7 +27,14 @@ export const fetchTle = async () => {
     // localStorage unavailable or corrupt - fetch fresh
   }
 
-  const response = await fetch(TLE_URL);
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
+  let response;
+  try {
+    response = await fetch(TLE_URL, { signal: controller.signal });
+  } finally {
+    clearTimeout(timeoutId);
+  }
   if (!response.ok) {
     throw new Error('Unable to fetch TLE data.');
   }

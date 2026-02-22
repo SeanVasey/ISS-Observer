@@ -6,8 +6,8 @@ import Globe from 'globe.gl';
 import * as satellite from 'satellite.js';
 import SunCalc from 'suncalc';
 
-// Import leaflet terminator after leaflet is loaded
-import '@joergdietrich/leaflet.terminator';
+// Import leaflet terminator (default export is a factory function)
+import terminator from '@joergdietrich/leaflet.terminator';
 
 // Make satellite and SunCalc available globally for lib modules
 globalThis.satellite = satellite;
@@ -138,7 +138,7 @@ const createUserIcon = () => {
   });
 };
 
-const createTerminator = () => L.terminator();
+const createTerminator = () => terminator();
 
 const initVisualization = () => {
   map = L.map('map', {
@@ -865,57 +865,62 @@ const registerServiceWorker = async () => {
 };
 
 const init = async () => {
-  elements.issStatus.textContent = 'Initializing...';
-  loadSettings();
-  hydrateFromUrl();
-  initVisualization();
-  applySettings();
-  updateLocationInputs();
-
-  const globeEl = document.querySelector('#globe');
-  globe.width(globeEl.clientWidth);
-  globe.height(globeEl.clientHeight);
-
-  // Load saved location
   try {
-    const savedLocation = localStorage.getItem('vasey-location');
-    if (savedLocation) {
-      const parsed = JSON.parse(savedLocation);
-      state.observer.lat = parsed.lat;
-      state.observer.lon = parsed.lon;
-      state.locationName = parsed.name;
-      map.setView([state.observer.lat, state.observer.lon], 3);
-      userMarker.setLatLng([state.observer.lat, state.observer.lon]);
-      updateLocationInputs();
-    }
-  } catch {
-    // localStorage unavailable or corrupt
-  }
+    elements.issStatus.textContent = 'Initializing...';
+    loadSettings();
+    hydrateFromUrl();
+    initVisualization();
+    applySettings();
+    updateLocationInputs();
 
-  // Fetch TLE data with retry
-  let retries = 3;
-  while (retries > 0) {
+    const globeEl = document.querySelector('#globe');
+    globe.width(globeEl.clientWidth);
+    globe.height(globeEl.clientHeight);
+
+    // Load saved location
     try {
-      const tle = await fetchTle();
-      state.satrec = getSatrec(tle);
-      recalcPasses();
-      startLoop();
-      updateLoop();
-      break;
-    } catch (error) {
-      retries--;
-      if (retries > 0) {
-        elements.issStatus.textContent = `Retrying orbital data fetch...`;
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-      } else {
-        elements.issStatus.textContent = 'Unable to load ISS orbital data. Refresh to try again.';
-        elements.locationFeedback.textContent = error.message;
+      const savedLocation = localStorage.getItem('vasey-location');
+      if (savedLocation) {
+        const parsed = JSON.parse(savedLocation);
+        state.observer.lat = parsed.lat;
+        state.observer.lon = parsed.lon;
+        state.locationName = parsed.name;
+        map.setView([state.observer.lat, state.observer.lon], 3);
+        userMarker.setLatLng([state.observer.lat, state.observer.lon]);
+        updateLocationInputs();
+      }
+    } catch {
+      // localStorage unavailable or corrupt
+    }
+
+    // Fetch TLE data with retry
+    let retries = 3;
+    while (retries > 0) {
+      try {
+        const tle = await fetchTle();
+        state.satrec = getSatrec(tle);
+        recalcPasses();
+        startLoop();
+        updateLoop();
+        break;
+      } catch (error) {
+        retries--;
+        if (retries > 0) {
+          elements.issStatus.textContent = `Retrying orbital data fetch...`;
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+        } else {
+          elements.issStatus.textContent = 'Unable to load ISS orbital data. Refresh to try again.';
+          elements.locationFeedback.textContent = error.message;
+        }
       }
     }
-  }
 
-  // Register PWA service worker
-  registerServiceWorker();
+    // Register PWA service worker
+    registerServiceWorker();
+  } catch (error) {
+    elements.issStatus.textContent = 'Failed to initialize. Refresh to try again.';
+    console.error('ISS Observer init error:', error);
+  }
 };
 
 bindEvents();
