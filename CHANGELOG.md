@@ -13,7 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated ISS status formatting to display coordinates, altitude, and speed on separate lines for readability.
 
 ### Changed
-- Refined the hero header to match the VASEY sibling-app style: centered stacked brand layout, VASEY/SPACE eyebrow above the icon, and turquoise glow treatment on the title/icon.
+- Refined hero and section typography: switched headings to Bebas Neue condensed all-caps styling, standardized body copy on Reddit Sans, and removed unused Sora font loading.
+- Reworked hero brand lockup to place the ISS icon to the left of the title with centered alignment, returning a black title with a subtle cyan stroke and no glow.
 
 ## [0.2.0] — 2026-02-22
 
