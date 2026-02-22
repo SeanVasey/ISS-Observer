@@ -27,8 +27,8 @@ src/
 public/
   manifest.json    — PWA web app manifest
   sw.js            — Service worker for offline caching
-  iss-icon-*.png   — PWA icons at various sizes
-  favicon.svg      — Browser tab icon
+  iss-icon.svg     — Cosmic-themed ISS icon (64x64)
+  favicon.svg      — Browser tab icon (32x32)
   config.js        — Runtime config (nominatimEmail)
 ```
 

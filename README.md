@@ -1,34 +1,41 @@
-# VASEY/SPACE — ISS Tracker
+# ISS Observer — VASEY/SPACE
 
+[![CI](https://github.com/SeanVasey/ISS-Observer/actions/workflows/ci.yml/badge.svg)](https://github.com/SeanVasey/ISS-Observer/actions/workflows/ci.yml)
 [![JavaScript](https://img.shields.io/badge/JavaScript-ES2022-F7DF1E?logo=javascript&logoColor=000000)](https://developer.mozilla.org/docs/Web/JavaScript)
-[![HTML5](https://img.shields.io/badge/HTML5-Markup-E34F26?logo=html5&logoColor=ffffff)](https://developer.mozilla.org/docs/Web/HTML)
-[![CSS3](https://img.shields.io/badge/CSS3-Styles-1572B6?logo=css3&logoColor=ffffff)](https://developer.mozilla.org/docs/Web/CSS)
-[![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions&logoColor=ffffff)](.github/workflows/ci.yml)
-[![Status](https://img.shields.io/badge/Status-Active-2ea44f)](#)
+[![Vite](https://img.shields.io/badge/Vite-7.x-646CFF?logo=vite&logoColor=ffffff)](https://vite.dev)
+[![PWA](https://img.shields.io/badge/PWA-Installable-5A0FC8?logo=pwa&logoColor=ffffff)](#pwa)
+[![Version](https://img.shields.io/badge/Version-0.2.0-111827)](#changelog)
 [![License](https://img.shields.io/badge/License-MIT-3DA639)](LICENSE)
 
-A modernized ISS tracking and sighting predictor experience that blends real-time orbital telemetry, viewing predictions, and synchronized 2D + 3D visualization.
+A real-time International Space Station tracker that combines orbital telemetry, personalized pass predictions, and synchronized 2D + 3D visualization — built as a mobile-first PWA with a monochrome space-age aesthetic.
 
-![VASEY/SPACE — ISS Tracker promotional hero image](docs/assets/iss-tracker-hero.svg)
-
-![VASEY/SPACE — ISS Tracker interface preview](docs/assets/iss-tracker-ui.svg)
+![ISS Observer promotional hero image](docs/assets/iss-tracker-hero.svg)
 
 ## Features
 
-- **Real-time ISS telemetry** with live latitude/longitude, altitude, and velocity.
-- **Personalized pass predictions** including rise/peak/set times, azimuths, duration, and visibility labels.
-- **Top pick recommendations** scored by elevation, duration, and darkness.
-- **Dual visualization** with a 2D ground track map, 3D globe, and day/night terminator overlay.
-- **Reminders + sharing** via downloadable calendar invites and shareable URLs.
-- **Responsive VASEY/SPACE styling** with accessible, mobile-friendly layouts.
+- **Real-time ISS telemetry** — live latitude/longitude, altitude, and velocity updated every second.
+- **Personalized pass predictions** — 72-hour window with rise/peak/set times, azimuths, duration, and visibility labels for any location.
+- **Visibility analysis** — accounts for civil twilight at observer location and ISS sunlight illumination to determine when the station is actually visible to the naked eye.
+- **Top pick recommendations** — best viewing opportunities scored by elevation (50%), duration (30%), and sky darkness (20%).
+- **Countdown timer** — live countdown to the next upcoming pass.
+- **Dual visualization** — synchronized 2D Leaflet ground track map and 3D Globe.gl interactive globe with day/night terminator overlay.
+- **Reminders + sharing** — downloadable `.ics` calendar invites and shareable URLs with encoded pass details.
+- **Installable PWA** — service worker with offline caching, web app manifest, and iOS home screen support.
+- **Mobile-first design** — optimized for iOS with safe area insets, touch-friendly controls, and responsive breakpoints.
+- **Monochrome aesthetic** — clean light backgrounds with dark text providing stark contrast for a space-age look.
 
 ## Tech Stack
 
-- **Vanilla JavaScript (ES modules)**
-- **Leaflet** (CDN) for 2D mapping
-- **Globe.gl + Three.js** (CDN) for 3D visualization
-- **satellite.js + SunCalc** (CDN) for orbital propagation and sun position
-- **Node.js scripts** for local dev, linting, tests, and build packaging
+| Layer | Technology |
+|-------|-----------|
+| Language | Vanilla JavaScript (ES2022 modules) |
+| Bundler | [Vite](https://vite.dev) 7.x |
+| 2D Maps | [Leaflet](https://leafletjs.com) + [CARTO](https://carto.com) light tiles |
+| 3D Globe | [Globe.gl](https://globe.gl) + [Three.js](https://threejs.org) |
+| Orbital Mechanics | [satellite.js](https://github.com/shashwatak/satellite-js) 5.x |
+| Sun Position | [SunCalc](https://github.com/mourner/suncalc) |
+| Analytics | [@vercel/analytics](https://vercel.com/analytics) |
+| Deployment | [Vercel](https://vercel.com) |
 
 ## Getting Started
 
@@ -39,13 +46,17 @@ A modernized ISS tracking and sighting predictor experience that blends real-tim
 
 ### Install
 
-No package installation is required. The app loads third-party libraries from a CDN and uses lightweight Node.js scripts for dev/build/test.
+```bash
+npm install
+```
 
-### Run (development)
+### Development
 
 ```bash
 npm run dev
 ```
+
+Opens the Vite dev server at `http://localhost:3000`.
 
 ### Build
 
@@ -53,16 +64,27 @@ npm run dev
 npm run build
 ```
 
-### Test
+Produces a production-ready `dist/` directory.
+
+### Preview
 
 ```bash
-npm run lint
-npm run test
+npm run preview
 ```
 
-## Environment Variables
+Serves the built `dist/` on port 4173 for local verification.
 
-Edit `public/config.js` to add a contact email for the OpenStreetMap Nominatim geocoder:
+### Lint & Test
+
+```bash
+npm run lint       # Syntax check all .js files
+npm test           # Run unit tests (Node.js native test runner)
+npm run test:watch # Run tests in watch mode
+```
+
+## Configuration
+
+Edit `public/config.js` to set a contact email for the OpenStreetMap Nominatim geocoder (recommended for production to comply with their usage policy):
 
 ```js
 window.VASEY_CONFIG = {
@@ -74,38 +96,75 @@ window.VASEY_CONFIG = {
 
 ```
 .
-├── index.html
+├── index.html              # App shell with PWA meta tags
+├── package.json            # Dependencies and scripts (v0.2.0)
+├── vite.config.js          # Vite build configuration
+├── vercel.json             # Vercel deployment and headers
+├── CLAUDE.md               # AI assistant context
 ├── src/
-│   ├── main.js
-│   ├── style.css
+│   ├── main.js             # App bootstrap, state, UI, visualization
+│   ├── style.css           # Monochrome design system
 │   └── lib/
-│       ├── format.js
-│       ├── orbit.js
-│       └── passes.js
-├── tests/
-├── docs/
-│   └── MANIFEST.md
+│       ├── format.js       # Formatting helpers, scoring, brightness
+│       ├── orbit.js        # TLE fetch/cache, propagation, sun position
+│       └── passes.js       # 72-hour pass prediction, visibility
 ├── public/
-│   └── config.js
+│   ├── config.js           # Runtime configuration
+│   ├── manifest.json       # PWA web app manifest
+│   ├── sw.js               # Service worker (cache-first static, network-first API)
+│   ├── favicon.svg         # Browser tab icon
+│   └── iss-icon.svg        # Cosmic-themed ISS icon
+├── tests/
+│   └── format.test.js      # Unit tests for format helpers
 ├── scripts/
-│   ├── build.mjs
-│   ├── lint.mjs
-│   └── serve.mjs
-└── .github/workflows/ci.yml
+│   ├── lint.mjs            # Syntax linter
+│   ├── build.mjs           # Legacy build script
+│   └── serve.mjs           # Legacy dev server
+├── docs/
+│   └── assets/             # Promotional artwork
+└── .github/
+    └── workflows/
+        └── ci.yml          # CI pipeline (lint → test → build)
 ```
 
-## Usage Notes
+## PWA
 
-- The ISS position is computed from live TLE data provided by Celestrak. Data is cached locally for 12 hours.
-- Pass visibility uses a combination of sun elevation (civil twilight) and ISS sunlight checks.
-- All times are shown in the browser's local timezone.
+ISS Observer is installable as a Progressive Web App:
+
+- **Service worker** caches static assets (cache-first) and API responses (network-first with fallback).
+- **Web app manifest** enables Add to Home Screen on iOS and Android.
+- **Offline support** — previously loaded data remains accessible without a network connection.
+
+## How It Works
+
+1. **TLE data** is fetched from [Celestrak](https://celestrak.org) and cached locally for 12 hours.
+2. **Orbital propagation** uses the SGP4 algorithm via satellite.js to compute the ISS position at any given time.
+3. **Pass prediction** iterates through a 72-hour window at 20-second steps, detecting when the ISS rises above the observer's horizon.
+4. **Visibility determination** checks two conditions simultaneously: the observer must be in civil twilight (sun below -6°) and the ISS must be sunlit (not in Earth's shadow).
+5. **Sun position** is calculated using simplified astronomical algorithms for ECI coordinates, with a cylindrical Earth shadow model for sunlight detection.
+6. All times are displayed in the browser's local timezone via the `Intl.DateTimeFormat` API.
 
 ## Deployment
 
-Run `npm run build` to produce a static `dist/` directory. Deploy the contents to any static hosting provider (Netlify, Vercel, GitHub Pages, S3).
+### Vercel (recommended)
+
+The repository includes `vercel.json` with:
+- Build command: `npm run build`
+- Output directory: `dist/`
+- Security headers (X-Content-Type-Options, X-Frame-Options, X-XSS-Protection)
+- Immutable caching for hashed assets
+- SPA rewrites with PWA asset exclusions
+
+### Other providers
+
+Run `npm run build` and deploy the `dist/` directory to any static hosting provider (Netlify, GitHub Pages, S3, Cloudflare Pages).
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for version history.
 
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE).
 
 See [ASSETS_LICENSE.md](ASSETS_LICENSE.md) for third-party asset attribution.

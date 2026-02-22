@@ -191,32 +191,18 @@ export const isSatSunlit = (positionEci, date) => {
  * Uses SunCalc for the observer-independent sun declination/RA
  * and GMST for converting to geodetic coordinates.
  */
+/**
+ * Get the sub-solar point (where the sun is directly overhead).
+ * Uses simplified astronomical calculation for declination and hour angle.
+ */
 export const getSunSubPoint = (date) => {
-  const SunCalc = globalThis.SunCalc;
-  if (!SunCalc) {
-    return { lat: 0, lon: 0 };
-  }
-
-  // Get sun position at equator/prime meridian to extract declination
-  const sunTimes = SunCalc.getPosition(date, 0, 0);
-  // Sun altitude at equator/prime meridian gives us info, but we need a different approach
-  // for the sub-solar point.
-
-  // Calculate sun declination and right ascension using SunCalc internals
-  // SunCalc.getPosition returns azimuth and altitude for a specific observer
-  // For sub-solar point, we need the declination (latitude) and
-  // the hour angle (which combined with GMST gives longitude)
-
-  const satellite = getSatellite();
-  const gmst = satellite.gstime(date);
-
-  // Use simplified solar position calculation
+  // Declination from day of year (Earth's axial tilt)
   const dayOfYear = Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 86400000);
   const declination = -23.44 * Math.cos(toRadians((360 / 365) * (dayOfYear + 10)));
 
-  // Hour angle: the sun's longitude is based on time of day
+  // Sun longitude from UTC time (15 degrees per hour, solar noon at 12:00 UTC = 0° lon)
   const hours = date.getUTCHours() + date.getUTCMinutes() / 60 + date.getUTCSeconds() / 3600;
-  const sunLon = -(hours - 12) * 15; // 15 degrees per hour, noon = 0
+  const sunLon = -(hours - 12) * 15;
 
   return {
     lat: declination,
