@@ -762,16 +762,32 @@ const bindEvents = () => {
   const settingsPanel = document.querySelector('.settings-dropdown');
   const settingsContent = document.querySelector('#settings-content');
   if (settingsToggle) {
+    const setSettingsExpanded = (expanded) => {
+      settingsToggle.setAttribute('aria-expanded', String(expanded));
+      if (settingsPanel) settingsPanel.classList.toggle('is-open', expanded);
+      if (!settingsContent) return;
+
+      if (expanded) {
+        settingsContent.hidden = false;
+        requestAnimationFrame(() => {
+          if (settingsPanel) settingsPanel.classList.add('is-open');
+        });
+      } else {
+        if (settingsContent.hidden) return;
+        const handleClose = () => {
+          settingsContent.hidden = true;
+          settingsContent.removeEventListener('transitionend', handleClose);
+        };
+        settingsContent.addEventListener('transitionend', handleClose);
+      }
+    };
+
     const isExpanded = settingsToggle.getAttribute('aria-expanded') === 'true';
-    if (settingsPanel) settingsPanel.classList.toggle('is-open', isExpanded);
-    if (settingsContent) settingsContent.hidden = !isExpanded;
+    setSettingsExpanded(isExpanded);
 
     settingsToggle.addEventListener('click', () => {
       const expanded = settingsToggle.getAttribute('aria-expanded') === 'true';
-      const nextExpanded = !expanded;
-      settingsToggle.setAttribute('aria-expanded', String(nextExpanded));
-      if (settingsPanel) settingsPanel.classList.toggle('is-open', nextExpanded);
-      if (settingsContent) settingsContent.hidden = !nextExpanded;
+      setSettingsExpanded(!expanded);
     });
   }
 
