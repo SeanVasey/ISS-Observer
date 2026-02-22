@@ -75,6 +75,7 @@
 }
 
 body {
+  font-family: 'Reddit Sans', system-ui, -apple-system, sans-serif;
   margin: 0;
   background: var(--bg);
   color: var(--text);
@@ -95,14 +96,15 @@ body {
 }
 
 h1, h2, h3 {
-  font-family: 'Sora', sans-serif;
+  font-family: 'Bebas Neue', 'Arial Narrow', sans-serif;
   margin: 0;
   color: var(--text);
 }
 
 .section-title {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: 'Bebas Neue', 'Arial Narrow', sans-serif;
   letter-spacing: 0.14em;
+  font-weight: 400;
   font-size: 1.1rem;
   color: var(--muted);
   margin: 0;
@@ -156,26 +158,35 @@ h1, h2, h3 {
 }
 
 .hero__brand {
-  display: flex;
-  flex-direction: column;
+  display: inline-flex;
+  flex-direction: row;
   align-items: center;
-  gap: 0.7rem;
+  justify-content: center;
+  gap: 0.85rem;
 }
 
 .hero__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
 }
 
 .hero__brand .hero__icon svg {
-  filter: drop-shadow(0 0 12px rgba(45, 212, 191, 0.42)) drop-shadow(0 0 28px rgba(45, 212, 191, 0.24));
+  display: block;
+  filter: none;
 }
 
 .hero h1 {
-  font-size: clamp(2rem, 5vw, 3.2rem);
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  color: #8df4ea;
-  text-shadow: 0 0 12px rgba(45, 212, 191, 0.7), 0 0 28px rgba(45, 212, 191, 0.35);
+  font-family: 'Bebas Neue', 'Arial Narrow', sans-serif;
+  text-transform: uppercase;
+  font-size: clamp(2.2rem, 5.2vw, 3.5rem);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  color: #000;
+  -webkit-text-stroke: 0.8px var(--turquoise-dark);
+  text-shadow: none;
 }
 
 .hero__subhead {
@@ -255,6 +266,11 @@ main {
   flex-direction: column;
   gap: 0.3rem;
   margin-bottom: 1.4rem;
+}
+
+.panel__header h2 {
+  font-family: 'Bebas Neue', 'Arial Narrow', sans-serif;
+  text-transform: uppercase;
 }
 
 /* === FORM FIELDS === */
@@ -831,7 +847,7 @@ main {
   }
 
   .hero h1 {
-    font-size: 1.8rem;
+    font-size: 2rem;
   }
 
   .hero__eyebrow {
