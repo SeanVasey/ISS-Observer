@@ -9,8 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Corrected globe path data shape to prevent `points.map is not a function` runtime errors.
-- Made the settings menu collapse/expand state fully synchronized via `aria-expanded`, `hidden`, and CSS fallback class.
+- Prevented collapsed settings fields from leaking outside the dropdown by defaulting the panel to hidden and tightening `hidden`/transition behavior.
 - Updated ISS status formatting to display coordinates, altitude, and speed on separate lines for readability.
+
+### Changed
+- Refined the hero header to match the VASEY sibling-app style: centered stacked brand layout, VASEY/SPACE eyebrow above the icon, and turquoise glow treatment on the title/icon.
 
 ## [0.2.0] — 2026-02-22
 
