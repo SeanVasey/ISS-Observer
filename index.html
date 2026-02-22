@@ -108,8 +108,38 @@
       </header>
 
       <main>
+        <section class="panel location-panel" aria-labelledby="location-heading">
+          <div class="panel__header">
+            <h2 id="location-heading" class="section-title">LOCATION</h2>
+            <p class="section-description">Set your location to get personalized pass predictions.</p>
+          </div>
+          <div class="location-panel__controls">
+            <div class="button-row button-row--top">
+              <button id="use-location" class="button button--location" type="button">Use my location</button>
+            </div>
+            <label class="field">
+              <span>Search by city or place</span>
+              <input id="location-search" type="text" placeholder="Seattle, WA" autocomplete="off" />
+            </label>
+            <div class="field-group">
+              <label class="field">
+                <span>Latitude</span>
+                <input id="location-lat" type="number" step="0.0001" min="-90" max="90" placeholder="47.6062" />
+              </label>
+              <label class="field">
+                <span>Longitude</span>
+                <input id="location-lon" type="number" step="0.0001" min="-180" max="180" placeholder="-122.3321" />
+              </label>
+            </div>
+            <div class="button-row">
+              <button id="apply-location" class="button" type="button">Update predictions</button>
+            </div>
+            <p id="location-feedback" class="helper-text" role="status" aria-live="polite"></p>
+          </div>
+        </section>
+
         <section class="panel settings-dropdown" aria-labelledby="settings-heading">
-          <button class="settings-dropdown__toggle" id="settings-toggle" type="button" aria-expanded="false" aria-controls="settings-content">
+          <button class="settings-dropdown__toggle" id="settings-toggle" type="button" aria-expanded="true" aria-controls="settings-content">
             <h2 id="settings-heading" class="section-title">SETTINGS</h2>
             <svg class="settings-dropdown__chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
               <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -120,8 +150,8 @@
               <label class="field">
                 <span>Units</span>
                 <select id="setting-units">
+                  <option value="imperial" selected>Imperial (mi, mph)</option>
                   <option value="metric">Metric (km, km/s)</option>
-                  <option value="imperial">Imperial (mi, mph)</option>
                 </select>
               </label>
               <label class="field">
@@ -151,34 +181,6 @@
           </div>
         </section>
 
-        <section class="panel location-panel" aria-labelledby="location-heading">
-          <div class="panel__header">
-            <h2 id="location-heading" class="section-title">LOCATION</h2>
-            <p class="section-description">Enter a city or coordinates to personalize pass predictions for your area.</p>
-          </div>
-          <div class="location-panel__controls">
-            <label class="field">
-              <span>Search by city or place</span>
-              <input id="location-search" type="text" placeholder="Seattle, WA" autocomplete="off" />
-            </label>
-            <div class="field-group">
-              <label class="field">
-                <span>Latitude</span>
-                <input id="location-lat" type="number" step="0.0001" min="-90" max="90" placeholder="47.6062" />
-              </label>
-              <label class="field">
-                <span>Longitude</span>
-                <input id="location-lon" type="number" step="0.0001" min="-180" max="180" placeholder="-122.3321" />
-              </label>
-            </div>
-            <div class="button-row">
-              <button id="use-location" class="button button--primary" type="button">Use my location</button>
-              <button id="apply-location" class="button" type="button">Update predictions</button>
-            </div>
-            <p id="location-feedback" class="helper-text" role="status" aria-live="polite"></p>
-          </div>
-        </section>
-
         <section class="panel" aria-labelledby="top-picks-heading">
           <div class="panel__header">
             <h2 id="top-picks-heading" class="section-title">TOP PICKS</h2>
@@ -196,6 +198,8 @@
             <button id="toggle-view" class="button" type="button">Toggle 2D / 3D</button>
             <button id="center-iss" class="button" type="button">Center on ISS</button>
             <button id="center-user" class="button" type="button">Center on my location</button>
+            <button id="globe-zoom-in" class="button button--small button--zoom" type="button" aria-label="Zoom in">+</button>
+            <button id="globe-zoom-out" class="button button--small button--zoom" type="button" aria-label="Zoom out">&minus;</button>
           </div>
           <div class="visualization__grid">
             <div class="map" id="map" role="region" aria-label="2D world map"></div>
