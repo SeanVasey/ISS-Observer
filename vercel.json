@@ -35,7 +35,7 @@
   ],
   "rewrites": [
     {
-      "source": "/((?!assets).*)",
+      "source": "/((?!assets|sw\\.js|manifest\\.json|favicon\\.svg|iss-icon\\.svg|config\\.js).*)",
       "destination": "/index.html"
     }
   ]

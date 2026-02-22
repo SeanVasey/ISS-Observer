@@ -1,96 +1,94 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
   <defs>
-    <!-- Glow filter for the icon -->
-    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+    <linearGradient id="cosmicBody" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#2d2d2d"/>
+      <stop offset="100%" style="stop-color:#111111"/>
+    </linearGradient>
+    <linearGradient id="cosmicTruss" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#444"/>
+      <stop offset="50%" style="stop-color:#222"/>
+      <stop offset="100%" style="stop-color:#444"/>
+    </linearGradient>
+    <linearGradient id="cosmicPanel" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#333"/>
+      <stop offset="100%" style="stop-color:#1a1a1a"/>
+    </linearGradient>
+    <radialGradient id="cosmicGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#fff;stop-opacity:0.15"/>
+      <stop offset="100%" style="stop-color:#fff;stop-opacity:0"/>
+    </radialGradient>
+    <filter id="starGlow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="1.5" result="glow"/>
       <feMerge>
-        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="glow"/>
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
     </filter>
-    <!-- Gradient for solar panels -->
-    <linearGradient id="solarGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#1a1a2e"/>
-      <stop offset="100%" style="stop-color:#0d0d1a"/>
-    </linearGradient>
-    <!-- Gradient for the main body -->
-    <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#ff8a4c"/>
-      <stop offset="100%" style="stop-color:#ff6b2c"/>
-    </linearGradient>
-    <!-- Maroon gradient for truss -->
-    <linearGradient id="trussGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#4a1c23"/>
-      <stop offset="50%" style="stop-color:#722f37"/>
-      <stop offset="100%" style="stop-color:#4a1c23"/>
-    </linearGradient>
   </defs>
 
-  <!-- Background glow circle -->
-  <circle cx="32" cy="32" r="28" fill="none" stroke="#ff6b2c" stroke-width="0.5" opacity="0.3" filter="url(#glow)"/>
+  <!-- Cosmic background glow -->
+  <circle cx="32" cy="32" r="30" fill="url(#cosmicGlow)"/>
 
-  <!-- Main truss structure -->
-  <rect x="8" y="30" width="48" height="4" rx="1" fill="url(#trussGrad)" stroke="#fff" stroke-width="0.5"/>
+  <!-- Orbit ring -->
+  <ellipse cx="32" cy="32" rx="28" ry="10" fill="none" stroke="#bbb" stroke-width="0.4" opacity="0.3" transform="rotate(-15 32 32)"/>
 
-  <!-- Solar panel left (angled) -->
-  <g transform="rotate(-8 16 32)">
-    <rect x="2" y="24" width="20" height="16" rx="1" fill="url(#solarGrad)" stroke="#ff6b2c" stroke-width="1.5"/>
-    <!-- Solar cell lines -->
-    <line x1="6" y1="24" x2="6" y2="40" stroke="#ff6b2c" stroke-width="0.5" opacity="0.6"/>
-    <line x1="10" y1="24" x2="10" y2="40" stroke="#ff6b2c" stroke-width="0.5" opacity="0.6"/>
-    <line x1="14" y1="24" x2="14" y2="40" stroke="#ff6b2c" stroke-width="0.5" opacity="0.6"/>
-    <line x1="18" y1="24" x2="18" y2="40" stroke="#ff6b2c" stroke-width="0.5" opacity="0.6"/>
-    <!-- Horizontal lines -->
-    <line x1="2" y1="28" x2="22" y2="28" stroke="#ff6b2c" stroke-width="0.3" opacity="0.4"/>
-    <line x1="2" y1="32" x2="22" y2="32" stroke="#ff6b2c" stroke-width="0.3" opacity="0.4"/>
-    <line x1="2" y1="36" x2="22" y2="36" stroke="#ff6b2c" stroke-width="0.3" opacity="0.4"/>
+  <!-- Distant stars -->
+  <circle cx="8" cy="12" r="0.6" fill="#999" opacity="0.6"/>
+  <circle cx="52" cy="8" r="0.5" fill="#aaa" opacity="0.5"/>
+  <circle cx="56" cy="48" r="0.7" fill="#888" opacity="0.4"/>
+  <circle cx="12" cy="52" r="0.4" fill="#999" opacity="0.5"/>
+  <circle cx="48" cy="20" r="0.3" fill="#bbb" opacity="0.7"/>
+  <circle cx="16" cy="24" r="0.5" fill="#aaa" opacity="0.3"/>
+
+  <!-- Main truss -->
+  <rect x="8" y="30" width="48" height="3.5" rx="1" fill="url(#cosmicTruss)" stroke="#555" stroke-width="0.5"/>
+
+  <!-- Solar panel left -->
+  <g transform="rotate(-6 16 32)">
+    <rect x="2" y="24" width="19" height="15" rx="1" fill="url(#cosmicPanel)" stroke="#666" stroke-width="1"/>
+    <line x1="6" y1="24" x2="6" y2="39" stroke="#555" stroke-width="0.4" opacity="0.6"/>
+    <line x1="10" y1="24" x2="10" y2="39" stroke="#555" stroke-width="0.4" opacity="0.6"/>
+    <line x1="14" y1="24" x2="14" y2="39" stroke="#555" stroke-width="0.4" opacity="0.6"/>
+    <line x1="18" y1="24" x2="18" y2="39" stroke="#555" stroke-width="0.4" opacity="0.6"/>
+    <line x1="2" y1="28" x2="21" y2="28" stroke="#555" stroke-width="0.3" opacity="0.4"/>
+    <line x1="2" y1="32" x2="21" y2="32" stroke="#555" stroke-width="0.3" opacity="0.4"/>
+    <line x1="2" y1="36" x2="21" y2="36" stroke="#555" stroke-width="0.3" opacity="0.4"/>
   </g>
 
-  <!-- Solar panel right (angled) -->
-  <g transform="rotate(8 48 32)">
-    <rect x="42" y="24" width="20" height="16" rx="1" fill="url(#solarGrad)" stroke="#ff6b2c" stroke-width="1.5"/>
-    <!-- Solar cell lines -->
-    <line x1="46" y1="24" x2="46" y2="40" stroke="#ff6b2c" stroke-width="0.5" opacity="0.6"/>
-    <line x1="50" y1="24" x2="50" y2="40" stroke="#ff6b2c" stroke-width="0.5" opacity="0.6"/>
-    <line x1="54" y1="24" x2="54" y2="40" stroke="#ff6b2c" stroke-width="0.5" opacity="0.6"/>
-    <line x1="58" y1="24" x2="58" y2="40" stroke="#ff6b2c" stroke-width="0.5" opacity="0.6"/>
-    <!-- Horizontal lines -->
-    <line x1="42" y1="28" x2="62" y2="28" stroke="#ff6b2c" stroke-width="0.3" opacity="0.4"/>
-    <line x1="42" y1="32" x2="62" y2="32" stroke="#ff6b2c" stroke-width="0.3" opacity="0.4"/>
-    <line x1="42" y1="36" x2="62" y2="36" stroke="#ff6b2c" stroke-width="0.3" opacity="0.4"/>
+  <!-- Solar panel right -->
+  <g transform="rotate(6 48 32)">
+    <rect x="43" y="24" width="19" height="15" rx="1" fill="url(#cosmicPanel)" stroke="#666" stroke-width="1"/>
+    <line x1="47" y1="24" x2="47" y2="39" stroke="#555" stroke-width="0.4" opacity="0.6"/>
+    <line x1="51" y1="24" x2="51" y2="39" stroke="#555" stroke-width="0.4" opacity="0.6"/>
+    <line x1="55" y1="24" x2="55" y2="39" stroke="#555" stroke-width="0.4" opacity="0.6"/>
+    <line x1="59" y1="24" x2="59" y2="39" stroke="#555" stroke-width="0.4" opacity="0.6"/>
+    <line x1="43" y1="28" x2="62" y2="28" stroke="#555" stroke-width="0.3" opacity="0.4"/>
+    <line x1="43" y1="32" x2="62" y2="32" stroke="#555" stroke-width="0.3" opacity="0.4"/>
+    <line x1="43" y1="36" x2="62" y2="36" stroke="#555" stroke-width="0.3" opacity="0.4"/>
   </g>
 
-  <!-- Central modules cluster -->
-  <g filter="url(#glow)">
-    <!-- Main pressurized module -->
-    <rect x="24" y="26" width="16" height="12" rx="3" fill="url(#bodyGrad)" stroke="#fff" stroke-width="1"/>
+  <!-- Central module -->
+  <rect x="24" y="26" width="16" height="12" rx="3" fill="url(#cosmicBody)" stroke="#888" stroke-width="0.8"/>
+  <ellipse cx="32" cy="32" rx="5" ry="3.5" fill="#eee" stroke="#999" stroke-width="0.5" opacity="0.85"/>
+  <circle cx="28" cy="32" r="2" fill="#333" stroke="#888" stroke-width="0.5"/>
+  <circle cx="36" cy="32" r="2" fill="#333" stroke="#888" stroke-width="0.5"/>
+  <circle cx="32" cy="32" r="1.2" fill="#111" stroke="#aaa" stroke-width="0.4"/>
 
-    <!-- Module details -->
-    <ellipse cx="32" cy="32" rx="5" ry="4" fill="#fff" stroke="#ff6b2c" stroke-width="0.5" opacity="0.9"/>
+  <!-- Radiator panels -->
+  <rect x="22" y="18" width="3.5" height="6" rx="0.5" fill="#ddd" opacity="0.9" stroke="#999" stroke-width="0.3"/>
+  <rect x="38.5" y="18" width="3.5" height="6" rx="0.5" fill="#ddd" opacity="0.9" stroke="#999" stroke-width="0.3"/>
+  <rect x="22" y="40" width="3.5" height="6" rx="0.5" fill="#ddd" opacity="0.9" stroke="#999" stroke-width="0.3"/>
+  <rect x="38.5" y="40" width="3.5" height="6" rx="0.5" fill="#ddd" opacity="0.9" stroke="#999" stroke-width="0.3"/>
 
-    <!-- Port holes / docking ports -->
-    <circle cx="27" cy="32" r="2.5" fill="#722f37" stroke="#fff" stroke-width="0.5"/>
-    <circle cx="37" cy="32" r="2.5" fill="#722f37" stroke="#fff" stroke-width="0.5"/>
-
-    <!-- Center viewport -->
-    <circle cx="32" cy="32" r="1.5" fill="#4a1c23" stroke="#ff6b2c" stroke-width="0.5"/>
-  </g>
-
-  <!-- Radiator panels (white for contrast) -->
-  <rect x="22" y="18" width="4" height="6" rx="0.5" fill="#fff" opacity="0.9" stroke="#722f37" stroke-width="0.3"/>
-  <rect x="38" y="18" width="4" height="6" rx="0.5" fill="#fff" opacity="0.9" stroke="#722f37" stroke-width="0.3"/>
-  <rect x="22" y="40" width="4" height="6" rx="0.5" fill="#fff" opacity="0.9" stroke="#722f37" stroke-width="0.3"/>
-  <rect x="38" y="40" width="4" height="6" rx="0.5" fill="#fff" opacity="0.9" stroke="#722f37" stroke-width="0.3"/>
-
-  <!-- Animated pulse ring -->
-  <circle cx="32" cy="32" r="12" fill="none" stroke="#ff6b2c" stroke-width="1" opacity="0.6">
-    <animate attributeName="r" values="10;14;10" dur="2s" repeatCount="indefinite"/>
-    <animate attributeName="opacity" values="0.6;0.2;0.6" dur="2s" repeatCount="indefinite"/>
+  <!-- Cosmic glow pulse -->
+  <circle cx="32" cy="32" r="12" fill="none" stroke="#999" stroke-width="0.8" opacity="0.4" filter="url(#starGlow)">
+    <animate attributeName="r" values="10;15;10" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.4;0.1;0.4" dur="3s" repeatCount="indefinite"/>
   </circle>
 
-  <!-- Outer glow ring -->
-  <circle cx="32" cy="32" r="18" fill="none" stroke="#722f37" stroke-width="0.5" opacity="0.4">
-    <animate attributeName="r" values="16;20;16" dur="3s" repeatCount="indefinite"/>
-    <animate attributeName="opacity" values="0.4;0.1;0.4" dur="3s" repeatCount="indefinite"/>
+  <!-- Outer celestial ring -->
+  <circle cx="32" cy="32" r="20" fill="none" stroke="#777" stroke-width="0.3" opacity="0.2">
+    <animate attributeName="r" values="18;22;18" dur="4s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.25;0.05;0.25" dur="4s" repeatCount="indefinite"/>
   </circle>
 </svg>
