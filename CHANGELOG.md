@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] — 2026-02-23
+
+### Changed
+- Replaced all ISS icons (hero, map marker, favicon, PWA icon) with the new simplified ISS illustration SVG across the entire codebase.
+- Removed old inline SVG icons from `index.html` (hero section) and `src/main.js` (map marker) in favor of referencing the shared `iss-icon.svg` file.
+- Updated favicon to a square-cropped version of the new ISS illustration.
+- Added version pill badge ("v1.0") next to the app name in the header, matching the VASEY sibling app convention.
+- Bumped service worker cache version to `iss-observer-v1.0`.
+- Updated README with ISS icon display, additional technology badges (Node, Celestrak, Globe.gl), and version 1.0.0 references.
+
+### Removed
+- Old cosmic-themed 64x64 ISS icon (`iss-icon.svg`) and 32x32 favicon (`favicon.svg`).
+- Inline SVG icon markup from `index.html` hero section and `src/main.js` map marker.
+- Unused `iss_icon_simplified.svg` from root directory (moved to `public/iss-icon.svg`).
+
 ## [0.3.0] — 2026-02-22
 
 ### Added

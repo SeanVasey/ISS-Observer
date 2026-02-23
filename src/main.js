@@ -85,52 +85,13 @@ const MAX_DISPLAY_PASSES = 25;
 // ISS orbital altitude as fraction of Earth radius for 3D globe
 const ISS_ALT_GLOBE = 0.06;
 
-// Monochrome ISS Icon SVG for map marker
-const issIconSvg = `
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32">
-  <defs>
-    <linearGradient id="mBody" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#2d2d2d"/>
-      <stop offset="100%" style="stop-color:#111"/>
-    </linearGradient>
-  </defs>
-  <rect x="24" y="28" width="16" height="8" rx="2" fill="url(#mBody)" stroke="#888" stroke-width="0.8"/>
-  <g transform="rotate(-5 20 32)">
-    <rect x="2" y="26" width="18" height="12" rx="1" fill="#222" stroke="#666" stroke-width="1"/>
-    <line x1="5" y1="26" x2="5" y2="38" stroke="#555" stroke-width="0.4" opacity="0.7"/>
-    <line x1="8" y1="26" x2="8" y2="38" stroke="#555" stroke-width="0.4" opacity="0.7"/>
-    <line x1="11" y1="26" x2="11" y2="38" stroke="#555" stroke-width="0.4" opacity="0.7"/>
-    <line x1="14" y1="26" x2="14" y2="38" stroke="#555" stroke-width="0.4" opacity="0.7"/>
-    <line x1="17" y1="26" x2="17" y2="38" stroke="#555" stroke-width="0.4" opacity="0.7"/>
-  </g>
-  <g transform="rotate(5 44 32)">
-    <rect x="44" y="26" width="18" height="12" rx="1" fill="#222" stroke="#666" stroke-width="1"/>
-    <line x1="47" y1="26" x2="47" y2="38" stroke="#555" stroke-width="0.4" opacity="0.7"/>
-    <line x1="50" y1="26" x2="50" y2="38" stroke="#555" stroke-width="0.4" opacity="0.7"/>
-    <line x1="53" y1="26" x2="53" y2="38" stroke="#555" stroke-width="0.4" opacity="0.7"/>
-    <line x1="56" y1="26" x2="56" y2="38" stroke="#555" stroke-width="0.4" opacity="0.7"/>
-    <line x1="59" y1="26" x2="59" y2="38" stroke="#555" stroke-width="0.4" opacity="0.7"/>
-  </g>
-  <rect x="20" y="30" width="24" height="4" fill="#333" stroke="#555" stroke-width="0.5"/>
-  <ellipse cx="32" cy="32" rx="4" ry="3" fill="#eee" stroke="#999" stroke-width="0.5"/>
-  <circle cx="28" cy="32" r="2" fill="#333" opacity="0.9"/>
-  <circle cx="36" cy="32" r="2" fill="#333" opacity="0.9"/>
-  <rect x="22" y="20" width="3" height="6" fill="#ddd" opacity="0.8"/>
-  <rect x="39" y="20" width="3" height="6" fill="#ddd" opacity="0.8"/>
-  <rect x="22" y="38" width="3" height="6" fill="#ddd" opacity="0.8"/>
-  <rect x="39" y="38" width="3" height="6" fill="#ddd" opacity="0.8"/>
-  <ellipse cx="32" cy="32" rx="8" ry="6" fill="none" stroke="#999" stroke-width="0.5" opacity="0.3">
-    <animate attributeName="opacity" values="0.2;0.5;0.2" dur="3s" repeatCount="indefinite"/>
-  </ellipse>
-</svg>`;
-
-// Create custom Leaflet icon for ISS
+// Create custom Leaflet icon for ISS using the updated icon
 const createIssIcon = () => {
   return L.divIcon({
     className: 'iss-marker',
-    html: `<div class="iss-icon">${issIconSvg}</div>`,
-    iconSize: [32, 32],
-    iconAnchor: [16, 16]
+    html: '<div class="iss-icon"><img src="/iss-icon.svg" alt="ISS" width="48" height="32" /></div>',
+    iconSize: [48, 32],
+    iconAnchor: [24, 16]
   });
 };
 
