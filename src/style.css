@@ -121,8 +121,8 @@ h1, h2, h3 {
 
 /* === HERO === */
 .hero {
-  padding: 3rem 5vw 2rem;
-  padding-top: calc(3rem + env(safe-area-inset-top));
+  padding: 2.5rem 5vw 2rem;
+  padding-top: calc(2.5rem + env(safe-area-inset-top));
   background: var(--bg-pure);
   border-bottom: 1px solid var(--border);
   position: relative;
@@ -147,10 +147,10 @@ h1, h2, h3 {
 .hero__eyebrow {
   font-family: 'Bebas Neue', sans-serif;
   text-transform: uppercase;
-  letter-spacing: 0.25em;
+  letter-spacing: 0.3em;
   color: #9aa7d6;
   margin: 0 0 0.5rem;
-  font-size: 1rem;
+  font-size: 0.85rem;
 }
 
 .hero__eyebrow-category {
@@ -162,7 +162,18 @@ h1, h2, h3 {
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 0.85rem;
+  gap: 0.75rem;
+  margin-bottom: 0.15rem;
+  position: relative;
+}
+
+.hero__brand-glow {
+  position: absolute;
+  inset: -12px -24px;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.05) 0%, transparent 70%);
+  border-radius: 50%;
+  z-index: 0;
+  pointer-events: none;
 }
 
 .hero__icon {
@@ -170,30 +181,36 @@ h1, h2, h3 {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  position: relative;
+  z-index: 1;
 }
 
 .hero__brand .hero__icon svg {
   display: block;
-  filter: none;
+  filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.1));
 }
 
 .hero h1 {
   font-family: 'Bebas Neue', 'Arial Narrow', sans-serif;
   text-transform: uppercase;
-  font-size: clamp(2.2rem, 5.2vw, 3.5rem);
+  font-size: clamp(2.4rem, 5.5vw, 3.8rem);
   font-weight: 400;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   line-height: 1;
   color: #000;
-  -webkit-text-stroke: 0.8px var(--turquoise-dark);
-  text-shadow: none;
+  text-shadow:
+    0 0 30px rgba(0, 0, 0, 0.07),
+    0 0 60px rgba(0, 0, 0, 0.03);
+  -webkit-text-stroke: none;
+  position: relative;
+  z-index: 1;
 }
 
 .hero__subhead {
   max-width: 600px;
   color: var(--muted);
-  margin: 0.8rem auto 1.8rem;
-  font-size: 0.95rem;
+  margin: 0.8rem auto 1.6rem;
+  font-size: 0.92rem;
   line-height: 1.6;
 }
 
@@ -481,6 +498,14 @@ main {
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 }
 
+.visualization__map-container {
+  position: relative;
+}
+
+.visualization__globe-container {
+  position: relative;
+}
+
 .map,
 .globe {
   height: 350px;
@@ -496,6 +521,30 @@ main {
 .globe:hover {
   border-color: var(--accent);
   box-shadow: var(--shadow-lg);
+}
+
+/* Globe zoom controls — positioned over the globe */
+.globe-zoom-controls {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 10;
+}
+
+.globe-zoom-controls .button--zoom {
+  background: var(--bg-pure);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow);
+  border-radius: 8px;
+}
+
+.globe-zoom-controls .button--zoom:hover {
+  background: var(--accent);
+  color: var(--bg-pure);
+  border-color: var(--accent);
 }
 
 /* === PASSES === */
@@ -805,11 +854,25 @@ main {
   border-color: var(--turquoise);
 }
 
+/* ISS 3D marker label */
+.iss-3d-label {
+  background: var(--text);
+  color: var(--bg-pure);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
 /* === RESPONSIVE - Mobile First === */
 @media (max-width: 900px) {
   .hero {
-    padding: 2.2rem 4vw 1.5rem;
-    padding-top: calc(2.2rem + env(safe-area-inset-top));
+    padding: 2rem 4vw 1.5rem;
+    padding-top: calc(2rem + env(safe-area-inset-top));
   }
 
   main {
@@ -847,11 +910,11 @@ main {
   }
 
   .hero h1 {
-    font-size: 2rem;
+    font-size: 2.1rem;
   }
 
   .hero__eyebrow {
-    font-size: 0.85rem;
+    font-size: 0.78rem;
   }
 
   .hero__subhead {
@@ -887,6 +950,14 @@ main {
     font-size: 1rem;
   }
 
+  /* Keep zoom buttons compact on mobile */
+  .globe-zoom-controls .button--zoom {
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
+    font-size: 1.3rem;
+  }
+
   .field-group {
     grid-template-columns: 1fr;
   }
@@ -918,14 +989,20 @@ main {
   }
 
   .map, .globe {
-    height: 280px;
+    height: 300px;
   }
 
-  .button--zoom {
-    width: 44px;
-    height: 44px;
-    min-height: 44px;
-    font-size: 1.3rem;
+  .visualization__controls {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .visualization__controls .button {
+    width: auto;
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 0.85rem;
+    padding: 0.6rem 0.8rem;
   }
 
   .footer {
@@ -958,6 +1035,10 @@ main {
   .pass {
     grid-template-columns: 1fr;
   }
+
+  .map, .globe {
+    height: 260px;
+  }
 }
 
 /* PWA standalone mode adjustments */
@@ -983,4 +1064,9 @@ main {
     --border-strong: rgba(0, 0, 0, 0.4);
     --muted: #4b5563;
   }
+}
+
+/* Leaflet terminator — ensure day/night is visible */
+.leaflet-terminator {
+  fill-opacity: 0.15;
 }

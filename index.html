@@ -39,8 +39,9 @@
         <div class="hero__content">
           <p class="hero__eyebrow">VASEY/<span class="hero__eyebrow-category">SPACE</span></p>
           <div class="hero__brand">
+            <div class="hero__brand-glow" aria-hidden="true"></div>
             <span class="iss-icon hero__icon">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="48" height="48">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="44" height="44">
                 <defs>
                   <linearGradient id="heroBody" x1="0%" y1="0%" x2="0%" y2="100%">
                     <stop offset="0%" style="stop-color:#2d2d2d"/>
@@ -197,13 +198,19 @@
           <div class="visualization__controls">
             <button id="toggle-view" class="button" type="button">Toggle 2D / 3D</button>
             <button id="center-iss" class="button" type="button">Center on ISS</button>
-            <button id="center-user" class="button" type="button">Center on my location</button>
-            <button id="globe-zoom-in" class="button button--small button--zoom" type="button" aria-label="Zoom in">+</button>
-            <button id="globe-zoom-out" class="button button--small button--zoom" type="button" aria-label="Zoom out">&minus;</button>
+            <button id="center-user" class="button" type="button">My location</button>
           </div>
           <div class="visualization__grid">
-            <div class="map" id="map" role="region" aria-label="2D world map"></div>
-            <div class="globe" id="globe" role="region" aria-label="3D globe"></div>
+            <div class="visualization__map-container">
+              <div class="map" id="map" role="region" aria-label="2D world map"></div>
+            </div>
+            <div class="visualization__globe-container">
+              <div class="globe" id="globe" role="region" aria-label="3D globe"></div>
+              <div class="globe-zoom-controls">
+                <button id="globe-zoom-in" class="button button--zoom" type="button" aria-label="Globe zoom in">+</button>
+                <button id="globe-zoom-out" class="button button--zoom" type="button" aria-label="Globe zoom out">&minus;</button>
+              </div>
+            </div>
           </div>
         </section>
 

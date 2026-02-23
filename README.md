@@ -4,7 +4,7 @@
 [![JavaScript](https://img.shields.io/badge/JavaScript-ES2022-F7DF1E?logo=javascript&logoColor=000000)](https://developer.mozilla.org/docs/Web/JavaScript)
 [![Vite](https://img.shields.io/badge/Vite-7.x-646CFF?logo=vite&logoColor=ffffff)](https://vite.dev)
 [![PWA](https://img.shields.io/badge/PWA-Installable-5A0FC8?logo=pwa&logoColor=ffffff)](#pwa)
-[![Version](https://img.shields.io/badge/Version-0.2.0-111827)](#changelog)
+[![Version](https://img.shields.io/badge/Version-0.3.0-111827)](#changelog)
 [![License](https://img.shields.io/badge/License-MIT-3DA639)](LICENSE)
 
 A real-time International Space Station tracker that combines orbital telemetry, personalized pass predictions, and synchronized 2D + 3D visualization — built as a mobile-first PWA with a monochrome space-age aesthetic.
@@ -18,7 +18,7 @@ A real-time International Space Station tracker that combines orbital telemetry,
 - **Visibility analysis** — accounts for civil twilight at observer location and ISS sunlight illumination to determine when the station is actually visible to the naked eye.
 - **Top pick recommendations** — best viewing opportunities scored by elevation (50%), duration (30%), and sky darkness (20%).
 - **Countdown timer** — live countdown to the next upcoming pass.
-- **Dual visualization** — synchronized 2D Leaflet ground track map and 3D Globe.gl interactive globe with day/night terminator overlay.
+- **Dual visualization** — synchronized 2D Leaflet ground track map and 3D Globe.gl interactive globe with day/night terminator overlay and a 3D ISS model rendered on the globe.
 - **Reminders + sharing** — downloadable `.ics` calendar invites and shareable URLs with encoded pass details.
 - **Installable PWA** — service worker with offline caching, web app manifest, and iOS home screen support.
 - **Mobile-first design** — optimized for iOS with safe area insets, touch-friendly controls, and responsive breakpoints.
@@ -97,7 +97,7 @@ window.VASEY_CONFIG = {
 ```
 .
 ├── index.html              # App shell with PWA meta tags
-├── package.json            # Dependencies and scripts (v0.2.0)
+├── package.json            # Dependencies and scripts (v0.3.0)
 ├── vite.config.js          # Vite build configuration
 ├── vercel.json             # Vercel deployment and headers
 ├── CLAUDE.md               # AI assistant context
