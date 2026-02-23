@@ -51,6 +51,8 @@ const elements = {
   countdown: document.querySelector('#countdown'),
   topPicks: document.querySelector('#top-picks'),
   passes: document.querySelector('#passes'),
+  locationName: document.querySelector('#location-name'),
+  locationCoords: document.querySelector('#location-coords'),
   locationSearch: document.querySelector('#location-search'),
   locationLat: document.querySelector('#location-lat'),
   locationLon: document.querySelector('#location-lon'),
@@ -266,6 +268,9 @@ const initVisualization = () => {
     })
     .htmlAltitude(ISS_ALT_GLOBE + 0.015);
 
+  // Set initial point of view to observer location
+  globe.pointOfView({ lat: state.observer.lat, lng: state.observer.lon, altitude: 2.5 });
+
   // Smooth controls
   globe.controls().enableDamping = true;
   globe.controls().dampingFactor = 0.1;
@@ -313,13 +318,23 @@ const applySettings = () => {
   updateViewPreference();
 };
 
+const resizeGlobe = () => {
+  if (!globe) return;
+  const globeEl = document.querySelector('#globe');
+  if (!globeEl) return;
+  const w = globeEl.clientWidth;
+  const h = globeEl.clientHeight;
+  if (w > 0 && h > 0) {
+    globe.width(w);
+    globe.height(h);
+  }
+};
+
 const updateViewPreference = () => {
   const view = state.settings.view;
   const mapContainer = document.querySelector('.visualization__map-container');
   const globeContainer = document.querySelector('.visualization__globe-container');
   if (!map || !globe || !mapContainer || !globeContainer) return;
-  const mapEl = document.querySelector('#map');
-  const globeEl = document.querySelector('#globe');
   if (view === 'map') {
     mapContainer.style.display = 'block';
     globeContainer.style.display = 'none';
@@ -330,11 +345,11 @@ const updateViewPreference = () => {
     mapContainer.style.display = 'block';
     globeContainer.style.display = 'block';
   }
-  setTimeout(() => {
+  // Defer size recalculation to next frame so layout is settled
+  requestAnimationFrame(() => {
     map.invalidateSize();
-    globe.width(globeEl.clientWidth);
-    globe.height(globeEl.clientHeight);
-  }, 0);
+    resizeGlobe();
+  });
 };
 
 const updateLocationInputs = () => {
@@ -794,6 +809,7 @@ const applyLocation = async (lat, lon, name = '') => {
   }
 
   updateLocationInputs();
+  updateLocationDisplay();
   recalcPasses();
   elements.locationFeedback.textContent = `Location set to ${state.locationName}.`;
 };
@@ -819,6 +835,48 @@ const searchLocation = async (query) => {
     throw new Error('No results found for that location.');
   }
   return results[0];
+};
+
+const reverseGeocode = async (lat, lon) => {
+  const params = new URLSearchParams({
+    format: 'json',
+    lat: String(lat),
+    lon: String(lon),
+    zoom: '10'
+  });
+  const email = window.VASEY_CONFIG?.nominatimEmail;
+  if (email) {
+    params.set('email', email);
+  }
+  const response = await fetch(
+    `https://nominatim.openstreetmap.org/reverse?${params.toString()}`
+  );
+  if (!response.ok) return null;
+  const result = await response.json();
+  if (!result || result.error) return null;
+  // Build a short readable name from address components
+  const addr = result.address || {};
+  const city = addr.city || addr.town || addr.village || addr.hamlet || '';
+  const stateCode = addr.state || '';
+  const country = addr.country_code?.toUpperCase() || '';
+  if (city && stateCode) return `${city}, ${stateCode}`;
+  if (city && country) return `${city}, ${country}`;
+  if (result.display_name) {
+    // Return first two parts of the display name for brevity
+    const parts = result.display_name.split(',').map((s) => s.trim());
+    return parts.slice(0, 2).join(', ');
+  }
+  return null;
+};
+
+const updateLocationDisplay = () => {
+  if (elements.locationName) {
+    elements.locationName.textContent = state.locationName;
+  }
+  if (elements.locationCoords) {
+    elements.locationCoords.textContent =
+      `${state.observer.lat.toFixed(4)}, ${state.observer.lon.toFixed(4)}`;
+  }
 };
 
 const bindEvents = () => {
@@ -857,12 +915,8 @@ const bindEvents = () => {
   }
 
   window.addEventListener('resize', () => {
-    const globeEl = document.querySelector('#globe');
-    if (globe && map) {
-      globe.width(globeEl.clientWidth);
-      globe.height(globeEl.clientHeight);
-      map.invalidateSize();
-    }
+    if (map) map.invalidateSize();
+    resizeGlobe();
   });
 
   // Clean up on page unload
@@ -877,11 +931,28 @@ const bindEvents = () => {
       elements.locationFeedback.textContent = 'Geolocation is not supported by your browser.';
       return;
     }
-    elements.locationFeedback.textContent = 'Requesting location permission...';
+    elements.locationFeedback.textContent = 'Requesting location...';
     navigator.geolocation.getCurrentPosition(
-      (position) => {
+      async (position) => {
         const { latitude, longitude } = position.coords;
-        applyLocation(latitude, longitude, 'My location');
+        // Apply immediately with temporary name, then resolve actual city
+        await applyLocation(latitude, longitude, 'Locating...');
+        try {
+          const cityName = await reverseGeocode(latitude, longitude);
+          if (cityName) {
+            state.locationName = cityName;
+            try {
+              localStorage.setItem(
+                'vasey-location',
+                JSON.stringify({ lat: latitude, lon: longitude, name: cityName })
+              );
+            } catch { /* localStorage unavailable */ }
+            updateLocationDisplay();
+            elements.locationFeedback.textContent = `Location set to ${cityName}.`;
+          }
+        } catch {
+          // Reverse geocoding failed — keep coordinates-based name
+        }
       },
       (error) => {
         if (error.code === error.PERMISSION_DENIED) {
@@ -1062,9 +1133,10 @@ const init = async () => {
     applySettings();
     updateLocationInputs();
 
-    const globeEl = document.querySelector('#globe');
-    globe.width(globeEl.clientWidth);
-    globe.height(globeEl.clientHeight);
+    // Defer initial globe sizing to ensure layout is settled
+    requestAnimationFrame(() => {
+      resizeGlobe();
+    });
 
     // Load saved location
     try {
@@ -1073,7 +1145,7 @@ const init = async () => {
         const parsed = JSON.parse(savedLocation);
         state.observer.lat = parsed.lat;
         state.observer.lon = parsed.lon;
-        state.locationName = parsed.name;
+        state.locationName = parsed.name || 'Custom location';
         map.setView([state.observer.lat, state.observer.lon], 3);
         userMarker.setLatLng([state.observer.lat, state.observer.lon]);
         updateLocationInputs();
@@ -1081,6 +1153,7 @@ const init = async () => {
     } catch {
       // localStorage unavailable or corrupt
     }
+    updateLocationDisplay();
 
     // Fetch TLE data with retry
     let retries = 3;

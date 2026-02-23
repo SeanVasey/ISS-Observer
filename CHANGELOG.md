@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] — 2026-02-23
+
+### Changed
+- Reduced excessive top spacing on mobile — removed double safe-area padding from body and hero, compacted hero section (eyebrow, subhead, status items) across all breakpoints including PWA standalone mode.
+- Location panel is now more compact with a visible current-location display showing the resolved city name and coordinates.
+- "Use my location" button now performs reverse geocoding via Nominatim to display the actual city/region name instead of the generic "My location" label.
+
+### Fixed
+- 3D globe sizing now uses `requestAnimationFrame` to defer layout measurement, preventing zero-dimension initialization when the container hasn't been laid out yet.
+- Globe initial point of view is set to the observer's coordinates on startup so the globe immediately shows a relevant view.
+- Window resize handler for globe uses safe dimension check to avoid setting zero width/height.
+
 ## [1.0.0] — 2026-02-23
 
 ### Changed

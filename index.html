@@ -44,7 +44,7 @@
               <img src="./public/iss-icon.svg" alt="ISS icon" width="66" height="44" />
             </span>
             <h1>ISS Observer</h1>
-            <span class="version-pill">v1.0</span>
+            <span class="version-pill">v1.0.1</span>
           </div>
           <p class="hero__subhead">
             Real-time International Space Station tracking with personalized pass predictions and visibility analysis.
@@ -74,7 +74,10 @@
         <section class="panel location-panel" aria-labelledby="location-heading">
           <div class="panel__header">
             <h2 id="location-heading" class="section-title">LOCATION</h2>
-            <p class="section-description">Set your location to get personalized pass predictions.</p>
+          </div>
+          <div class="location-current">
+            <span id="location-name" class="location-current__name">Seattle, WA</span>
+            <span id="location-coords" class="location-current__coords"></span>
           </div>
           <div class="location-panel__controls">
             <div class="button-row button-row--top">
