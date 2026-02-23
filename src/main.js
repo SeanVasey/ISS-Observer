@@ -91,9 +91,9 @@ const ISS_ALT_GLOBE = 0.06;
 const createIssIcon = () => {
   return L.divIcon({
     className: 'iss-marker',
-    html: '<div class="iss-icon"><img src="/iss-icon.svg" alt="ISS" width="48" height="32" /></div>',
-    iconSize: [48, 32],
-    iconAnchor: [24, 16]
+    html: '<div class="iss-icon"><img src="/iss-icon.svg" alt="ISS" width="36" height="36" /></div>',
+    iconSize: [36, 36],
+    iconAnchor: [18, 18]
   });
 };
 

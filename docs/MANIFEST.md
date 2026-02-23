@@ -14,8 +14,8 @@
 - `public/config.js` — Runtime configuration (Nominatim email).
 - `public/manifest.json` — PWA web app manifest.
 - `public/sw.js` — Service worker for offline caching.
-- `public/iss-icon.svg` — Cosmic-themed ISS icon (64x64).
-- `public/favicon.svg` — Browser tab icon (32x32).
+- `public/iss-icon.svg` — ISS badge icon (256x256).
+- `public/favicon.svg` — Browser tab icon (256x256 badge).
 
 ## Testing
 

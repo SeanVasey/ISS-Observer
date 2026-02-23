@@ -8,7 +8,7 @@
 [![JavaScript](https://img.shields.io/badge/JavaScript-ES2022-F7DF1E?logo=javascript&logoColor=000000)](https://developer.mozilla.org/docs/Web/JavaScript)
 [![Vite](https://img.shields.io/badge/Vite-7.x-646CFF?logo=vite&logoColor=ffffff)](https://vite.dev)
 [![PWA](https://img.shields.io/badge/PWA-Installable-5A0FC8?logo=pwa&logoColor=ffffff)](#pwa)
-[![Version](https://img.shields.io/badge/Version-1.0.1-111827)](#changelog)
+[![Version](https://img.shields.io/badge/Version-1.1.0-111827)](#changelog)
 [![License](https://img.shields.io/badge/License-MIT-3DA639)](LICENSE)
 [![Node](https://img.shields.io/badge/Node-%3E%3D18-339933?logo=node.js&logoColor=ffffff)](https://nodejs.org)
 [![Orbital Data](https://img.shields.io/badge/Orbital%20Data-Celestrak-0066CC)](https://celestrak.org)
@@ -104,7 +104,7 @@ window.VASEY_CONFIG = {
 ```
 .
 ├── index.html              # App shell with PWA meta tags
-├── package.json            # Dependencies and scripts (v1.0.1)
+├── package.json            # Dependencies and scripts (v1.1.0)
 ├── vite.config.js          # Vite build configuration
 ├── vercel.json             # Vercel deployment and headers
 ├── CLAUDE.md               # AI assistant context
