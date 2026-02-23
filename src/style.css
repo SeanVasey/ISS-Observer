@@ -578,18 +578,25 @@ main {
   display: grid;
   gap: 1rem;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .visualization__map-container {
   position: relative;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .visualization__globe-container {
   position: relative;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .map,
 .globe {
+  width: 100%;
   height: 350px;
   border-radius: var(--radius);
   overflow: hidden;
@@ -845,6 +852,8 @@ main {
 /* Globe Enhancement */
 #globe canvas {
   transition: filter 0.3s ease;
+  max-width: 100%;
+  display: block;
 }
 
 /* Section Title Underline */
@@ -871,6 +880,7 @@ main {
 /* Visualization Panel */
 .visualization {
   border: 1px solid var(--border-strong);
+  overflow: hidden;
 }
 
 /* User Location Marker */
