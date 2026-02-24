@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] — 2026-02-24
+
+### Changed
+- Replaced CLAUDE.md with expanded engineering guidelines covering workflow orchestration, verification protocols, commit hygiene, CI requirements, and repository completeness standards.
+- Added `tasks/` directory with `todo.md` (active task plan) and `lessons.md` (accumulated patterns from corrections) for session-based task tracking.
+
+### Fixed
+- Removed excessive bottom spacing caused by stacked padding on `body`, `#app`, and `.footer`. Safe area inset for notched screens is now applied only on the footer (the outermost bottom element), eliminating the large empty area below content.
+- Removed duplicate JSDoc comment block on `getSunSubPoint` in `orbit.js`.
+
 ## [1.1.0] — 2026-02-23
 
 ### Changed
