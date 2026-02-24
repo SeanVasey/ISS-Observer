@@ -31,9 +31,14 @@
 - `scripts/serve.mjs` — Legacy local dev server.
 - `.editorconfig`, `.gitignore` — Repo hygiene.
 
+## Task Tracking
+
+- `tasks/todo.md` — Active task plan with checkable items, updated per session.
+- `tasks/lessons.md` — Accumulated patterns from corrections and mistakes.
+
 ## Documentation
 
-- `CLAUDE.md` — AI assistant project context.
+- `CLAUDE.md` — AI assistant engineering guidelines and project context.
 - `README.md` — Product overview, setup, and deployment.
 - `CHANGELOG.md` — Version history.
 - `SECURITY.md` — Vulnerability reporting.

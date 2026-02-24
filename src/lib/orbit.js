@@ -195,11 +195,6 @@ export const isSatSunlit = (positionEci, date) => {
 
 /**
  * Get the sub-solar point (where the sun is directly overhead).
- * Uses SunCalc for the observer-independent sun declination/RA
- * and GMST for converting to geodetic coordinates.
- */
-/**
- * Get the sub-solar point (where the sun is directly overhead).
  * Uses simplified astronomical calculation for declination and hour angle.
  */
 export const getSunSubPoint = (date) => {

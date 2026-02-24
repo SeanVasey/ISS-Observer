@@ -82,14 +82,12 @@ body {
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  padding-bottom: env(safe-area-inset-bottom);
 }
 
 #app {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  padding-bottom: 3rem;
   max-width: 100%;
   overflow-x: hidden;
 }
