@@ -21,6 +21,15 @@
   --radius: 16px;
   --radius-sm: 10px;
   font-family: 'Reddit Sans', system-ui, -apple-system, sans-serif;
+
+  /* VASEY/AI Footer — custom property aliases */
+  --border-subtle: var(--border);
+  --border-glow: var(--turquoise-glow);
+  --accent-deep: var(--turquoise-dark);
+  --accent-dim: #1a9e8f;
+  --accent-primary: var(--turquoise);
+  --text-muted: var(--muted);
+  --accent-glow-strong: rgba(45, 212, 191, 0.5);
 }
 
 /* Keyframe Animations */
@@ -762,13 +771,104 @@ main {
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
 }
 
-/* === FOOTER === */
-.footer {
+/* === VASEY/AI Universal Footer === */
+.app-footer {
+  margin-top: 56px;
+  padding-top: 32px;
+  border-top: 1px solid var(--border-subtle);
   text-align: center;
-  color: var(--muted);
-  font-size: 0.82rem;
-  padding: 0 5vw 2rem;
   padding-bottom: calc(2rem + env(safe-area-inset-bottom));
+  animation: fadeInUp 0.8s ease-out 0.8s both;
+}
+
+.footer-divider {
+  width: 48px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-deep), transparent);
+  margin: 0 auto 28px;
+  animation: footerDividerPulse 3s ease-in-out infinite;
+}
+
+@keyframes footerDividerPulse {
+  0%, 100% { opacity: 0.6; width: 48px; }
+  50%      { opacity: 1;   width: 72px; }
+}
+
+.footer-brand-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.footer-logo {
+  opacity: 0.45;
+  transition: opacity 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+}
+.footer-logo:hover {
+  opacity: 0.85;
+  filter: drop-shadow(0 0 6px var(--accent-glow-strong));
+}
+
+.footer-logo-vm {
+  width: 36px;
+  height: 31px;
+}
+
+.footer-logo-va {
+  width: 34px;
+  height: 34px;
+}
+
+.footer-logo-sep {
+  width: 1px;
+  height: 24px;
+  background: var(--border-glow);
+}
+
+.footer-suite-tag {
+  font-family: 'Reddit Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.footer-app-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: var(--text-muted);
+  opacity: 0.7;
+  margin-bottom: 16px;
+}
+
+.footer-copyright {
+  font-family: 'Reddit Sans', sans-serif;
+  font-size: 11px;
+  color: var(--text-muted);
+  opacity: 0.5;
+  line-height: 1.6;
+  padding-bottom: 8px;
+}
+
+.footer-copyright a {
+  color: var(--accent-dim);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footer-copyright a:hover {
+  color: var(--accent-primary);
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* === ISS ICON & MARKER === */
