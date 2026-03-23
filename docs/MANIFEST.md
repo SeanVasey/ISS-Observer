@@ -29,7 +29,7 @@
 - `scripts/lint.mjs` — Syntax lint (`node --check`).
 - `scripts/build.mjs` — Legacy static build packaging.
 - `scripts/serve.mjs` — Legacy local dev server.
-- `.editorconfig`, `.gitignore` — Repo hygiene.
+- `.editorconfig`, `.gitignore`, `.env.example` — Repo hygiene.
 
 ## Task Tracking
 

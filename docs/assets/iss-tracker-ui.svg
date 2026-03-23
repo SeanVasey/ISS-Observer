@@ -8,7 +8,7 @@
   <rect width="1400" height="900" fill="url(#bg)" />
   <rect width="1400" height="120" fill="#1b202b" />
   <rect y="120" width="1400" height="8" fill="#ff6b2c" />
-  <text x="60" y="75" fill="#f5f7fb" font-family="Sora, sans-serif" font-size="48" font-weight="700">VASEY/SPACE — ISS Tracker</text>
+  <text x="60" y="75" fill="#f5f7fb" font-family="Sora, sans-serif" font-size="48" font-weight="700">VASEY/SPACE — ISS Observer</text>
   <text x="60" y="180" fill="#b3bcc8" font-family="Reddit Sans, sans-serif" font-size="24">Modern ISS tracking, pass predictions, and 2D/3D visualization.</text>
   <g>
     <rect x="60" y="240" width="360" height="200" rx="20" fill="#151922" stroke="#ff6b2c" stroke-width="2" />

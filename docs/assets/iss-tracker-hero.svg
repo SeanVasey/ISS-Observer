@@ -42,6 +42,6 @@
   <rect x="590" y="232" width="20" height="6" rx="3" fill="#F9B233"/>
   <rect x="560" y="298" width="80" height="10" rx="5" fill="#7AD7FF" opacity="0.8"/>
   <ellipse cx="600" cy="300" rx="180" ry="70" fill="url(#glow)" opacity="0.5"/>
-  <text x="120" y="120" fill="#E6EEF7" font-family="'Segoe UI', 'Inter', sans-serif" font-size="36" font-weight="600">ISS Tracker</text>
+  <text x="120" y="120" fill="#E6EEF7" font-family="'Segoe UI', 'Inter', sans-serif" font-size="36" font-weight="600">ISS Observer</text>
   <text x="120" y="168" fill="#B4C8E8" font-family="'Segoe UI', 'Inter', sans-serif" font-size="18">Real-time telemetry • Pass predictions • Dual 2D/3D views</text>
 </svg>
