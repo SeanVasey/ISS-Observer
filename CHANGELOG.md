@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] — 2026-03-23
+
+### Changed
+- Replaced CLAUDE.md with streamlined engineering standards: consolidated security guidance (auth, input validation, API access control, supply chain, production hardening), refined CI/CD section with deployment checklists, updated project structure template, and added README spec with badge/imagery requirements.
+- Overhauled README with centered badge row using HTML anchor tags, improved alt text on all images, added Contributing and Security sections, and referenced `.env.example`.
+- Fixed hero SVG and UI preview SVG branding — changed "ISS Tracker" to "ISS Observer" for consistency with the v0.2.0 rename.
+- Added `.env.example` documenting the environment variable pattern for the project.
+- Bumped version to 1.3.0 across package.json, index.html, service worker, and README badges.
+
 ## [1.2.0] — 2026-02-24
 
 ### Changed

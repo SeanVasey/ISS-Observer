@@ -1,22 +1,24 @@
 # ISS Observer — VASEY/SPACE
 
 <p align="center">
-  <img src="public/iss-icon.svg" alt="ISS Observer Icon" width="280" />
+  <img src="public/iss-icon.svg" alt="ISS Observer Icon — badge-style ISS illustration with Earth horizon and orbital arc" width="280" />
 </p>
 
-[![CI](https://github.com/SeanVasey/ISS-Observer/actions/workflows/ci.yml/badge.svg)](https://github.com/SeanVasey/ISS-Observer/actions/workflows/ci.yml)
-[![JavaScript](https://img.shields.io/badge/JavaScript-ES2022-F7DF1E?logo=javascript&logoColor=000000)](https://developer.mozilla.org/docs/Web/JavaScript)
-[![Vite](https://img.shields.io/badge/Vite-7.x-646CFF?logo=vite&logoColor=ffffff)](https://vite.dev)
-[![PWA](https://img.shields.io/badge/PWA-Installable-5A0FC8?logo=pwa&logoColor=ffffff)](#pwa)
-[![Version](https://img.shields.io/badge/Version-1.2.0-111827)](#changelog)
-[![License](https://img.shields.io/badge/License-MIT-3DA639)](LICENSE)
-[![Node](https://img.shields.io/badge/Node-%3E%3D18-339933?logo=node.js&logoColor=ffffff)](https://nodejs.org)
-[![Orbital Data](https://img.shields.io/badge/Orbital%20Data-Celestrak-0066CC)](https://celestrak.org)
-[![Globe](https://img.shields.io/badge/3D-Globe.gl-00C9A7)](https://globe.gl)
+<p align="center">
+  <a href="https://github.com/SeanVasey/ISS-Observer/actions/workflows/ci.yml"><img src="https://github.com/SeanVasey/ISS-Observer/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://developer.mozilla.org/docs/Web/JavaScript"><img src="https://img.shields.io/badge/JavaScript-ES2022-F7DF1E?logo=javascript&logoColor=000000" alt="JavaScript"></a>
+  <a href="https://vite.dev"><img src="https://img.shields.io/badge/Vite-7.x-646CFF?logo=vite&logoColor=ffffff" alt="Vite"></a>
+  <a href="#pwa"><img src="https://img.shields.io/badge/PWA-Installable-5A0FC8?logo=pwa&logoColor=ffffff" alt="PWA"></a>
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/Version-1.3.0-111827" alt="Version"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-3DA639" alt="License"></a>
+  <a href="https://nodejs.org"><img src="https://img.shields.io/badge/Node-%3E%3D18-339933?logo=node.js&logoColor=ffffff" alt="Node"></a>
+  <a href="https://celestrak.org"><img src="https://img.shields.io/badge/Orbital%20Data-Celestrak-0066CC" alt="Orbital Data"></a>
+  <a href="https://globe.gl"><img src="https://img.shields.io/badge/3D-Globe.gl-00C9A7" alt="Globe"></a>
+</p>
 
 A real-time International Space Station tracker that combines orbital telemetry, personalized pass predictions, and synchronized 2D + 3D visualization — built as a mobile-first PWA with a monochrome space-age aesthetic.
 
-![ISS Observer promotional hero image](docs/assets/iss-tracker-hero.svg)
+![ISS Observer promotional hero image showing the International Space Station over Earth with tracking arcs](docs/assets/iss-tracker-hero.svg)
 
 ## Features
 
@@ -91,7 +93,7 @@ npm run test:watch # Run tests in watch mode
 
 ## Configuration
 
-Edit `public/config.js` to set a contact email for the OpenStreetMap Nominatim geocoder (recommended for production to comply with their usage policy):
+Copy `.env.example` to configure optional environment variables. The only runtime configuration is the Nominatim geocoder email in `public/config.js`:
 
 ```js
 window.VASEY_CONFIG = {
@@ -99,15 +101,18 @@ window.VASEY_CONFIG = {
 };
 ```
 
+Setting a contact email is recommended for production to comply with the [OpenStreetMap Nominatim usage policy](https://operations.osmfoundation.org/policies/nominatim/).
+
 ## Project Structure
 
 ```
 .
 ├── index.html              # App shell with PWA meta tags
-├── package.json            # Dependencies and scripts (v1.2.0)
+├── package.json            # Dependencies and scripts (v1.3.0)
 ├── vite.config.js          # Vite build configuration
 ├── vercel.json             # Vercel deployment and headers
-├── CLAUDE.md               # AI assistant context
+├── .env.example            # Environment variable template
+├── CLAUDE.md               # AI assistant engineering guidelines
 ├── src/
 │   ├── main.js             # App bootstrap, state, UI, visualization
 │   ├── style.css           # Monochrome design system
@@ -131,7 +136,8 @@ window.VASEY_CONFIG = {
 │   ├── todo.md             # Active task plan
 │   └── lessons.md          # Accumulated lessons from corrections
 ├── docs/
-│   └── assets/             # Promotional artwork
+│   ├── MANIFEST.md         # File manifest
+│   └── assets/             # Promotional artwork (hero, UI preview)
 └── .github/
     └── workflows/
         └── ci.yml          # CI pipeline (lint → test → build)
@@ -168,6 +174,20 @@ The repository includes `vercel.json` with:
 ### Other providers
 
 Run `npm run build` and deploy the `dist/` directory to any static hosting provider (Netlify, GitHub Pages, S3, Cloudflare Pages).
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feat/your-feature`)
+3. Commit using [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `docs:`, etc.)
+4. Ensure CI passes (`npm run lint && npm test && npm run build`)
+5. Open a pull request
+
+See [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for community guidelines.
+
+## Security
+
+To report a vulnerability, see [SECURITY.md](SECURITY.md).
 
 ## Changelog
 
