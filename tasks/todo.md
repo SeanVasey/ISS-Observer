@@ -1,6 +1,16 @@
 # Task Plan
 
-## Current Session — 2026-03-23
+## Current Session — 2026-06-11
+
+- [x] Verify CLAUDE.md matches the canonical engineering standards (no drift found)
+- [x] Run full verification suite: npm ci, lint, tests, build — all green
+- [x] Fix all npm audit vulnerabilities (lodash-es, vite) via `npm audit fix`
+- [x] Add horizontal safe-area insets for notched iOS devices in landscape
+- [x] Bump version to 1.3.1 across all references (package.json, index.html, sw.js, README)
+- [x] Update CHANGELOG.md with 1.3.1 entry
+- [x] Commit, push, and open PR
+
+## Previous Session — 2026-03-23
 
 - [x] Replace CLAUDE.md with streamlined engineering standards
 - [x] Update README with centered badges, contributing section, security link, .env.example reference

@@ -99,6 +99,10 @@ body {
   gap: 1.5rem;
   max-width: 100%;
   overflow-x: hidden;
+  /* Horizontal safe areas for notched devices in landscape (top/bottom are
+     handled on .hero and .app-footer — see tasks/lessons.md) */
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 
 h1, h2, h3 {
