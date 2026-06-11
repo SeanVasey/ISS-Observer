@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.1] — 2026-06-11
+
+### Fixed
+- Added horizontal safe-area insets (`env(safe-area-inset-left/right)`) on the app container so content clears the sensor housing on notched iOS devices in landscape orientation. Top and bottom insets were already handled on the hero and footer.
+
+### Security
+- Resolved all `npm audit` findings (1 moderate, 4 high): updated `lodash-es` (transitive via globe.gl — code injection and prototype pollution advisories) and `vite` (dev server file-read advisories). Lockfile refreshed; zero known vulnerabilities remain.
+
+### Changed
+- Bumped version to 1.3.1 across package.json, index.html, service worker cache name, and README.
+
 ## [1.3.0] — 2026-03-23
 
 ### Changed
