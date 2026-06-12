@@ -138,10 +138,9 @@ body::before {
   gap: 1.5rem;
   max-width: 100%;
   overflow-x: hidden;
-  /* Horizontal safe areas for notched devices in landscape (top/bottom are
-     handled on .hero and .app-footer — see tasks/lessons.md) */
-  padding-left: var(--safe-left);
-  padding-right: var(--safe-right);
+  /* No safe-area padding here: full-width children (.hero) must bleed their
+     backgrounds edge-to-edge. Each section (.hero, main, .app-footer) folds
+     the horizontal insets into its own padding — see tasks/lessons.md */
 }
 
 h1, h2, h3 {
@@ -172,6 +171,8 @@ h1, h2, h3 {
 .hero {
   padding: 1rem 5vw 1rem;
   padding-top: calc(0.75rem + var(--safe-top));
+  padding-left: calc(5vw + var(--safe-left));
+  padding-right: calc(5vw + var(--safe-right));
   background: var(--bg-pure);
   border-bottom: 1px solid var(--border);
   position: relative;
@@ -326,6 +327,8 @@ main {
   flex-direction: column;
   gap: 1.5rem;
   padding: 0 5vw;
+  padding-left: calc(5vw + var(--safe-left));
+  padding-right: calc(5vw + var(--safe-right));
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
@@ -821,6 +824,8 @@ main {
   border-top: 1px solid var(--border-subtle);
   text-align: center;
   padding-bottom: calc(2rem + var(--safe-bottom));
+  padding-left: var(--safe-left);
+  padding-right: var(--safe-right);
   animation: fadeInUp 0.8s ease-out 0.8s both;
 }
 
@@ -1106,10 +1111,14 @@ main {
   .hero {
     padding: 0.75rem 4vw 0.75rem;
     padding-top: calc(0.5rem + var(--safe-top));
+    padding-left: calc(4vw + var(--safe-left));
+    padding-right: calc(4vw + var(--safe-right));
   }
 
   main {
     padding: 0 4vw;
+    padding-left: calc(4vw + var(--safe-left));
+    padding-right: calc(4vw + var(--safe-right));
   }
 
   .visualization__grid {

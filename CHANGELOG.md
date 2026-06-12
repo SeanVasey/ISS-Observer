@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- Moved horizontal safe-area insets from the `#app` container into each section's own padding (`.hero`, `main`, `.app-footer`) so the hero's full-width white surface bleeds edge-to-edge in landscape on notched devices instead of exposing gray body-background strips beside it. Insets remain applied once per edge per element.
 - Completed the iOS safe-area blend for the light theme: added the `mobile-web-app-capable` meta (standards-track companion to the Apple-prefixed one), aligned manifest `background_color` with the `#ffffff` top-of-page color so the launch background flows seamlessly into the status-bar region and hero, and added an `html` reset with `-webkit-text-size-adjust: 100%` and dynamic-viewport min-height.
 
 ### Changed
