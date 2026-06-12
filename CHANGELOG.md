@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- Completed the iOS safe-area blend for the light theme: added the `mobile-web-app-capable` meta (standards-track companion to the Apple-prefixed one), aligned manifest `background_color` with the `#ffffff` top-of-page color so the launch background flows seamlessly into the status-bar region and hero, and added an `html` reset with `-webkit-text-size-adjust: 100%` and dynamic-viewport min-height.
+
+### Changed
+- Centralized safe-area insets as `:root` tokens (`--safe-top/right/bottom/left`, wrapping `env(safe-area-inset-*)` with `0px` fallbacks) and migrated all six inset usages (top scrim, hero, app container, footer, standalone/mobile overrides) to them. No visual change — single source of truth for notch/home-indicator clearance.
 - Added a fixed top safe-area scrim (`body::before`, `height: env(safe-area-inset-top)`) filled with `--bg-pure` so scrolling content passes beneath the iOS status bar / Dynamic Island instead of colliding with the system clock and icons. The fill matches the hero surface and `theme-color`, so the region is indistinguishable from the app background at rest; the layer is `pointer-events: none`, adds no layout shift, and collapses to zero height on devices without a top inset.
 
 ## [1.3.2] — 2026-06-12
