@@ -4,7 +4,7 @@
   "description": "Real-time ISS tracking, pass predictions, and viewing recommendations.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f0f2f5",
+  "background_color": "#ffffff",
   "theme_color": "#ffffff",
   "orientation": "portrait-primary",
   "categories": ["education", "utilities"],
