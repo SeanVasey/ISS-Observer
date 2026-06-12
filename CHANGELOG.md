@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+- Added a fixed top safe-area scrim (`body::before`, `height: env(safe-area-inset-top)`) filled with `--bg-pure` so scrolling content passes beneath the iOS status bar / Dynamic Island instead of colliding with the system clock and icons. The fill matches the hero surface and `theme-color`, so the region is indistinguishable from the app background at rest; the layer is `pointer-events: none`, adds no layout shift, and collapses to zero height on devices without a top inset.
+
 ## [1.3.2] — 2026-06-12
 
 ### Fixed
