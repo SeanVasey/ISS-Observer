@@ -94,6 +94,27 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Top safe-area scrim — opaque mask over the iOS status bar / Dynamic Island
+   region so scrolling content passes beneath the system clock and icons.
+   Filled with --bg-pure to exactly match the hero surface that owns the top
+   edge at rest (and the #ffffff theme-color / manifest theme_color), so the
+   scrim is invisible when scrolled to top. The hero's own
+   env(safe-area-inset-top) padding keeps its content clear of this region —
+   the inset is applied once, there. Height collapses to 0 where no top inset
+   exists (desktop, landscape). */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: env(safe-area-inset-top, 0px);
+  background: var(--bg-pure);
+  /* Above Leaflet panes/controls (z-index ≤ 1000) so map content also masks */
+  z-index: 1200;
+  pointer-events: none;
+}
+
 #app {
   display: flex;
   flex-direction: column;
