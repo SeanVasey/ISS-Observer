@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.2] — 2026-06-12
+
+### Fixed
+- Corrected `theme-color` meta and manifest `theme_color` from `#111827` (the ink/text token) to `#ffffff` (`--bg-pure`, the hero background) so the status-bar region renders as a seamless continuation of the app background in installed PWA mode and Safari tab tinting, instead of a dark band over the light UI.
+- Changed `apple-mobile-web-app-status-bar-style` from `black-translucent` to `default` — the app is light-themed, so the white status-bar text rendered by `black-translucent` was invisible against the white hero in iOS standalone mode.
+- Added `min-height: 100dvh` on `body` (with `100vh` fallback) so the app shell fills the dynamic viewport on mobile browsers.
+
+### Changed
+- Bumped version to 1.3.2 across package.json, index.html, service worker cache name, and README so installed PWAs pick up the corrected head metadata.
+
 ## [1.3.1] — 2026-06-11
 
 ### Fixed
