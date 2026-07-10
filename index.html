@@ -38,8 +38,8 @@
     <!-- Sticky top bar lives outside #app: its overflow-x clipping would
          disable position: sticky for any descendant. -->
     <header class="topbar">
-        <div class="topbar__inner">
-          <p class="topbar__brand">VASEY/<span class="topbar__brand-category">SPACE</span></p>
+      <div class="topbar__inner">
+        <p class="topbar__brand">VASEY/<span class="topbar__brand-category">SPACE</span></p>
           <button
             id="settings-toggle"
             class="topbar__settings"
@@ -53,40 +53,40 @@
             </svg>
             <span class="topbar__settings-label">Settings</span>
           </button>
-        </div>
-        <div id="settings-menu" class="settings-menu" hidden>
-          <h2 id="settings-heading" class="section-title">SETTINGS</h2>
-          <div class="settings__grid">
-            <label class="field">
-              <span>Units</span>
-              <select id="setting-units">
-                <option value="imperial" selected>Imperial (mi, mph)</option>
-                <option value="metric">Metric (km, km/s)</option>
-              </select>
-            </label>
-            <label class="field">
-              <span>Update rate</span>
-              <select id="setting-rate">
-                <option value="1000">1 sec</option>
-                <option value="5000">5 sec</option>
-                <option value="10000">10 sec</option>
-              </select>
-            </label>
-            <label class="field">
-              <span>Time format</span>
-              <select id="setting-time">
-                <option value="24">24 hour</option>
-                <option value="12">12 hour</option>
-              </select>
-            </label>
-            <label class="field">
-              <span>Default view</span>
-              <select id="setting-view">
-                <option value="both">2D + 3D</option>
-                <option value="map">2D map only</option>
-                <option value="globe">3D globe only</option>
-              </select>
-            </label>
+          <div id="settings-menu" class="settings-menu" hidden>
+            <h2 id="settings-heading" class="section-title">SETTINGS</h2>
+            <div class="settings__grid">
+              <label class="field">
+                <span>Units</span>
+                <select id="setting-units">
+                  <option value="imperial" selected>Imperial (mi, mph)</option>
+                  <option value="metric">Metric (km, km/s)</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Update rate</span>
+                <select id="setting-rate">
+                  <option value="1000">1 sec</option>
+                  <option value="5000">5 sec</option>
+                  <option value="10000">10 sec</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Time format</span>
+                <select id="setting-time">
+                  <option value="24">24 hour</option>
+                  <option value="12">12 hour</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Default view</span>
+                <select id="setting-view">
+                  <option value="both">2D + 3D</option>
+                  <option value="map">2D map only</option>
+                  <option value="globe">3D globe only</option>
+                </select>
+              </label>
+            </div>
           </div>
         </div>
     </header>
