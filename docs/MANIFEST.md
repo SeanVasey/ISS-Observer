@@ -8,6 +8,7 @@
 - `src/lib/format.js` — Formatting helpers, scoring, and brightness estimation.
 - `src/lib/orbit.js` — TLE fetch/cache, orbital propagation, sun position, and sunlight detection.
 - `src/lib/passes.js` — 72-hour pass prediction and visibility analysis.
+- `src/lib/share.js` — Share link build/parse helpers and shared-pass matching.
 
 ## Public Assets
 
@@ -20,6 +21,7 @@
 ## Testing
 
 - `tests/format.test.js` — Unit tests for format helpers (Node.js native test runner).
+- `tests/share.test.js` — Unit tests for share link helpers and shared-pass matching.
 
 ## Infrastructure
 

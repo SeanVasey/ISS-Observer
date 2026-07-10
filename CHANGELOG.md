@@ -5,15 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.4.0] — 2026-07-10
 
 ### Fixed
-- Moved horizontal safe-area insets from the `#app` container into each section's own padding (`.hero`, `main`, `.app-footer`) so the hero's full-width white surface bleeds edge-to-edge in landscape on notched devices instead of exposing gray body-background strips beside it. Insets remain applied once per edge per element.
-- Completed the iOS safe-area blend for the light theme: added the `mobile-web-app-capable` meta (standards-track companion to the Apple-prefixed one), aligned manifest `background_color` with the `#ffffff` top-of-page color so the launch background flows seamlessly into the status-bar region and hero, and added an `html` reset with `-webkit-text-size-adjust: 100%` and dynamic-viewport min-height.
+- **Share links now work.** Opening a shared pass URL (`?lat&lon&pass`) previously did nothing useful: the `pass` parameter was never read, and on any device that had used the app before, the locally saved location silently overwrote the shared coordinates. Share links now take precedence over the saved location, match the shared pass against fresh orbital data (±15 min tolerance for TLE drift), pin it into the visible list regardless of pagination, highlight it with a "Shared pick" badge, scroll it into view, and explain the outcome in a dismissible banner — including friendly messaging when the shared pass has already occurred. Manually changing location exits shared mode and cleans the URL so a refresh returns to normal behavior.
+- Share links now carry the location name (`loc` param, capped at 80 chars, placeholder names omitted) so recipients see a real place name immediately; links without one are reverse-geocoded in the background.
+- Top picks always appear in the Upcoming Passes list (prioritization already guaranteed this; the shared pass is now also pinned when it would otherwise fall outside the 25-pass display cap).
+- Top picks and pass lists no longer show passes that have already ended when re-rendered long after computation.
+
+### Added
+- **Top pick actions** — each Top Pick card now has a rank badge ("Pick 1/2/3") and two actions: "View pass" jumps to the full pass card in Upcoming Passes (navigating pagination and flashing the card), and "Share" opens the native share sheet or copies the link.
+- `src/lib/share.js` — extracted, pure share-link helpers (`buildShareParams`, `parseShareParams`, `findSharedPass`) with full unit-test coverage in `tests/share.test.js` (regression tests for the broken-share-link bug).
+- Toast notifications (`role="status"`, `aria-live="polite"`) for copy/share/reminder feedback — previously copy feedback appeared as text inside the distant Location panel.
+- Calendar reminder downloads now confirm via toast.
 
 ### Changed
-- Centralized safe-area insets as `:root` tokens (`--safe-top/right/bottom/left`, wrapping `env(safe-area-inset-*)` with `0px` fallbacks) and migrated all six inset usages (top scrim, hero, app container, footer, standalone/mobile overrides) to them. No visual change — single source of truth for notch/home-indicator clearance.
-- Added a fixed top safe-area scrim (`body::before`, `height: env(safe-area-inset-top)`) filled with `--bg-pure` so scrolling content passes beneath the iOS status bar / Dynamic Island instead of colliding with the system clock and icons. The fill matches the hero surface and `theme-color`, so the region is indistinguishable from the app background at rest; the layer is `pointer-events: none`, adds no layout shift, and collapses to zero height on devices without a top inset.
+- **Settings moved into a new sticky top bar.** The full-width collapsible SETTINGS panel wedged between Location and Top Picks (awkward on mobile) is gone. A slim, always-visible top bar now carries the VASEY/SPACE brand and a Settings button that opens an anchored popover (same four controls, same persistence) — reachable from anywhere on the page, closable via Escape, outside tap, or the button. The hero eyebrow moved into the bar; disclosure semantics (`aria-expanded`/`aria-controls`) retained.
+- The top bar replaces the fixed `body::before` safe-area scrim: as the topmost sticky element it owns the top safe-area inset (applied once) and masks content scrolling beneath the iOS status bar with a blurred translucent surface. The standalone-mode hero padding override is no longer needed and was removed.
+- Share/Reminder and card action buttons render compact and side-by-side on phones instead of stacked full-width.
+- Bumped version to 1.4.0 across package.json, index.html (pill + footer), service worker cache name, and README.
+
+### Fixed (carried from unreleased)
+- Moved horizontal safe-area insets from the `#app` container into each section's own padding (`.hero`, `main`, `.app-footer`) so the hero's full-width white surface bleeds edge-to-edge in landscape on notched devices instead of exposing gray body-background strips beside it. Insets remain applied once per edge per element.
+- Completed the iOS safe-area blend for the light theme: added the `mobile-web-app-capable` meta (standards-track companion to the Apple-prefixed one), aligned manifest `background_color` with the `#ffffff` top-of-page color so the launch background flows seamlessly into the status-bar region and hero, and added an `html` reset with `-webkit-text-size-adjust: 100%` and dynamic-viewport min-height.
+- Centralized safe-area insets as `:root` tokens (`--safe-top/right/bottom/left`, wrapping `env(safe-area-inset-*)` with `0px` fallbacks) as the single source of truth for notch/home-indicator clearance.
 
 ## [1.3.2] — 2026-06-12
 

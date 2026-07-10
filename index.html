@@ -35,84 +35,26 @@
     <script defer src="/_vercel/insights/script.js"></script>
   </head>
   <body>
-    <div id="app">
-      <header class="hero">
-        <div class="hero__content">
-          <p class="hero__eyebrow">VASEY/<span class="hero__eyebrow-category">SPACE</span></p>
-          <div class="hero__brand">
-            <div class="hero__brand-glow" aria-hidden="true"></div>
-            <span class="iss-icon hero__icon">
-              <img src="./public/iss-icon.svg" alt="ISS icon" width="44" height="44" />
-            </span>
-            <h1>ISS Observer</h1>
-            <span class="version-pill">v1.3.2</span>
-          </div>
-          <p class="hero__subhead">
-            Real-time International Space Station tracking with personalized pass predictions and visibility analysis.
-          </p>
-          <div class="hero__status">
-            <div class="hero__status-item">
-              <span class="label">ISS STATUS</span>
-              <p id="iss-status" class="status-live">Loading orbital data...</p>
-            </div>
-            <div class="hero__status-item">
-              <span class="label">NEXT VISIBLE PASS</span>
-              <p id="next-pass">Calculating passes...</p>
-            </div>
-            <div class="hero__status-item">
-              <span class="label">VISIBILITY NOW</span>
-              <p id="visibility-state">--</p>
-            </div>
-            <div class="hero__status-item">
-              <span class="label">COUNTDOWN</span>
-              <p id="countdown">--</p>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <main>
-        <section class="panel location-panel" aria-labelledby="location-heading">
-          <div class="panel__header">
-            <h2 id="location-heading" class="section-title">LOCATION</h2>
-          </div>
-          <div class="location-current">
-            <span id="location-name" class="location-current__name">Seattle, WA</span>
-            <span id="location-coords" class="location-current__coords"></span>
-          </div>
-          <div class="location-panel__controls">
-            <div class="button-row button-row--top">
-              <button id="use-location" class="button button--location" type="button">Use my location</button>
-            </div>
-            <label class="field">
-              <span>Search by city or place</span>
-              <input id="location-search" type="text" placeholder="Seattle, WA" autocomplete="off" />
-            </label>
-            <div class="field-group">
-              <label class="field">
-                <span>Latitude</span>
-                <input id="location-lat" type="number" step="0.0001" min="-90" max="90" placeholder="47.6062" />
-              </label>
-              <label class="field">
-                <span>Longitude</span>
-                <input id="location-lon" type="number" step="0.0001" min="-180" max="180" placeholder="-122.3321" />
-              </label>
-            </div>
-            <div class="button-row">
-              <button id="apply-location" class="button" type="button">Update predictions</button>
-            </div>
-            <p id="location-feedback" class="helper-text" role="status" aria-live="polite"></p>
-          </div>
-        </section>
-
-        <section class="panel settings-dropdown" aria-labelledby="settings-heading">
-          <button class="settings-dropdown__toggle" id="settings-toggle" type="button" aria-expanded="false" aria-controls="settings-content">
-            <h2 id="settings-heading" class="section-title">SETTINGS</h2>
-            <svg class="settings-dropdown__chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Sticky top bar lives outside #app: its overflow-x clipping would
+         disable position: sticky for any descendant. -->
+    <header class="topbar">
+      <div class="topbar__inner">
+        <p class="topbar__brand">VASEY/<span class="topbar__brand-category">SPACE</span></p>
+          <button
+            id="settings-toggle"
+            class="topbar__settings"
+            type="button"
+            aria-expanded="false"
+            aria-controls="settings-menu"
+          >
+            <svg class="topbar__settings-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="3.2" />
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
             </svg>
+            <span class="topbar__settings-label">Settings</span>
           </button>
-          <div class="settings-dropdown__content" id="settings-content" hidden>
+          <div id="settings-menu" class="settings-menu" hidden>
+            <h2 id="settings-heading" class="section-title">SETTINGS</h2>
             <div class="settings__grid">
               <label class="field">
                 <span>Units</span>
@@ -145,6 +87,76 @@
                 </select>
               </label>
             </div>
+          </div>
+        </div>
+    </header>
+
+    <div id="app">
+      <section class="hero" aria-label="ISS Observer overview">
+        <div class="hero__content">
+          <div class="hero__brand">
+            <div class="hero__brand-glow" aria-hidden="true"></div>
+            <span class="iss-icon hero__icon">
+              <img src="./public/iss-icon.svg" alt="ISS icon" width="44" height="44" />
+            </span>
+            <h1>ISS Observer</h1>
+            <span class="version-pill">v1.4.0</span>
+          </div>
+          <p class="hero__subhead">
+            Real-time International Space Station tracking with personalized pass predictions and visibility analysis.
+          </p>
+          <div class="hero__status">
+            <div class="hero__status-item">
+              <span class="label">ISS STATUS</span>
+              <p id="iss-status" class="status-live">Loading orbital data...</p>
+            </div>
+            <div class="hero__status-item">
+              <span class="label">NEXT VISIBLE PASS</span>
+              <p id="next-pass">Calculating passes...</p>
+            </div>
+            <div class="hero__status-item">
+              <span class="label">VISIBILITY NOW</span>
+              <p id="visibility-state">--</p>
+            </div>
+            <div class="hero__status-item">
+              <span class="label">COUNTDOWN</span>
+              <p id="countdown">--</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <main>
+        <section class="panel location-panel" aria-labelledby="location-heading">
+          <div class="panel__header">
+            <h2 id="location-heading" class="section-title">LOCATION</h2>
+          </div>
+          <div class="location-current">
+            <span id="location-name" class="location-current__name">Seattle, WA</span>
+            <span id="location-coords" class="location-current__coords"></span>
+          </div>
+          <div class="location-panel__controls">
+            <div class="button-row button-row--top">
+              <button id="use-location" class="button button--location" type="button">Use my location</button>
+            </div>
+            <label class="field">
+              <span>Search by city or place</span>
+              <input id="location-search" type="text" placeholder="Seattle, WA" autocomplete="off" />
+            </label>
+            <div class="field-group">
+              <label class="field">
+                <span>Latitude</span>
+                <input id="location-lat" type="number" step="0.0001" min="-90" max="90" placeholder="47.6062" />
+              </label>
+              <label class="field">
+                <span>Longitude</span>
+                <input id="location-lon" type="number" step="0.0001" min="-180" max="180" placeholder="-122.3321" />
+              </label>
+            </div>
+            <div class="button-row">
+              <button id="apply-location" class="button" type="button">Update predictions</button>
+            </div>
+            <p id="location-feedback" class="helper-text" role="status" aria-live="polite"></p>
           </div>
         </section>
 
@@ -186,6 +198,14 @@
             <p class="section-description">
               Detailed rise, peak, and set times for your location. Visible passes require dark skies and a sunlit ISS.
             </p>
+          </div>
+          <div id="share-banner" class="share-banner" hidden>
+            <svg class="share-banner__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+            </svg>
+            <p id="share-banner-text" class="share-banner__text" role="status" aria-live="polite"></p>
+            <button id="share-banner-dismiss" class="share-banner__dismiss" type="button" aria-label="Dismiss shared pass notice">&times;</button>
           </div>
           <div id="passes" class="passes"></div>
         </section>
@@ -253,12 +273,14 @@ c-309 0 -323 -1 -332 -19 -6 -11 -57 -79 -115 -151 -126 -158 -178 -226 -377
         </div>
 
         <div class="footer-suite-tag">A VASEY/AI Production</div>
-        <div class="footer-app-tag">ISS Observer v1.3.2 · Real-Time ISS Tracker</div>
+        <div class="footer-app-tag">ISS Observer v1.4.0 · Real-Time ISS Tracker</div>
         <div class="footer-copyright">
           © 2026 <a href="https://vaseymultimedia.com" target="_blank" rel="noopener">VASEY Multimedia</a>. All rights reserved.<br>
           Designed &amp; engineered by <a href="https://vasey.ai" target="_blank" rel="noopener">VASEY/AI</a>
         </div>
       </footer>
+
+      <div id="toast" class="toast" role="status" aria-live="polite"></div>
     </div>
 
     <script>

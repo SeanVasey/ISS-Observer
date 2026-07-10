@@ -30,12 +30,21 @@ import {
   getSunSubPoint
 } from './lib/orbit.js';
 import { computePasses, describeVisibility } from './lib/passes.js';
+import { buildShareParams, parseShareParams, findSharedPass } from './lib/share.js';
 
 const state = {
   satrec: null,
   observer: { lat: 47.6062, lon: -122.3321, height: 0 },
   locationName: 'Seattle, WA',
   passes: [],
+  // Context carried by an opened share link (?lat&lon&pass). While active,
+  // the shared location wins over the locally saved one and the matched
+  // pass is pinned + highlighted in the list.
+  share: {
+    active: false,
+    passTime: null,
+    matched: null
+  },
   settings: {
     units: 'imperial',
     updateRate: 1000,
@@ -65,7 +74,11 @@ const elements = {
   settingUnits: document.querySelector('#setting-units'),
   settingRate: document.querySelector('#setting-rate'),
   settingTime: document.querySelector('#setting-time'),
-  settingView: document.querySelector('#setting-view')
+  settingView: document.querySelector('#setting-view'),
+  shareBanner: document.querySelector('#share-banner'),
+  shareBannerText: document.querySelector('#share-banner-text'),
+  shareBannerDismiss: document.querySelector('#share-banner-dismiss'),
+  toast: document.querySelector('#toast')
 };
 
 let map;
@@ -420,10 +433,34 @@ const updateVisibilityNow = () => {
   }
 };
 
+let toastTimer;
+const showToast = (message) => {
+  if (!elements.toast) return;
+  elements.toast.textContent = message;
+  elements.toast.classList.add('toast--visible');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    elements.toast.classList.remove('toast--visible');
+  }, 3200);
+};
+
+const showShareBanner = (message) => {
+  if (!elements.shareBanner || !elements.shareBannerText) return;
+  elements.shareBannerText.textContent = message;
+  elements.shareBanner.hidden = false;
+};
+
+const hideShareBanner = () => {
+  if (elements.shareBanner) {
+    elements.shareBanner.hidden = true;
+  }
+};
+
 const renderTopPicks = () => {
   elements.topPicks.innerHTML = '';
+  const now = new Date();
   const picks = [...state.passes]
-    .filter((pass) => pass.visible)
+    .filter((pass) => pass.visible && pass.end > now)
     .sort((a, b) => b.score - a.score)
     .slice(0, 3);
 
@@ -433,11 +470,14 @@ const renderTopPicks = () => {
     return;
   }
 
-  picks.forEach((pass) => {
-    const card = document.createElement('div');
-    card.className = 'card';
+  picks.forEach((pass, index) => {
+    const card = document.createElement('article');
+    card.className = 'card card--pick';
     card.innerHTML = `
-      <div class="badge badge--score">Score ${pass.score}</div>
+      <div class="card__badges">
+        <span class="badge badge--rank">Pick ${index + 1}</span>
+        <span class="badge badge--score">Score ${pass.score}</span>
+      </div>
       <p class="card__title">${formatDateTime(
         pass.start,
         state.settings.timeFormat
@@ -445,17 +485,51 @@ const renderTopPicks = () => {
       <p class="card__meta">Peak ${pass.maxElevation.toFixed(
         0
       )}° | ${formatDuration(pass.duration)} | ${pass.brightness}</p>
+      <div class="card__actions">
+        <button class="button button--small" type="button" data-view>View pass</button>
+        <button class="button button--small" type="button" data-share>Share</button>
+      </div>
     `;
+    card.querySelector('[data-view]').addEventListener('click', () => {
+      if (!jumpToPass(pass)) {
+        showToast('This pass is no longer in the upcoming list.');
+      }
+    });
+    card.querySelector('[data-share]').addEventListener('click', () => {
+      sharePass(pass);
+    });
     elements.topPicks.appendChild(card);
   });
 };
 
 const buildShareUrl = (pass) => {
-  const params = new URLSearchParams();
-  params.set('lat', state.observer.lat.toFixed(4));
-  params.set('lon', state.observer.lon.toFixed(4));
-  params.set('pass', pass.start.toISOString());
+  const params = buildShareParams(state.observer, pass, state.locationName);
   return `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+};
+
+const sharePass = async (pass) => {
+  const shareUrl = buildShareUrl(pass);
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: 'ISS pass details',
+        text: `ISS pass over ${state.locationName} — ${formatDateTime(pass.start, state.settings.timeFormat)}`,
+        url: shareUrl
+      });
+      return;
+    } catch (error) {
+      if (error?.name === 'AbortError') {
+        return; // User dismissed the share sheet
+      }
+      // Share sheet unavailable — fall back to the clipboard below
+    }
+  }
+  try {
+    await navigator.clipboard.writeText(shareUrl);
+    showToast('Share link copied to clipboard.');
+  } catch {
+    showToast('Unable to copy the share link.');
+  }
 };
 
 const createICS = (pass) => {
@@ -492,6 +566,13 @@ const getDisplayPasses = () => {
     .slice(0, 3);
 
   const prioritized = [...firstVisible, ...bonusVisible];
+
+  // Pin the pass a share link points at so it is always in the list
+  const shared = state.share.matched;
+  if (shared && upcoming.includes(shared) && !prioritized.includes(shared)) {
+    prioritized.push(shared);
+  }
+
   const prioritizedSet = new Set(prioritized);
 
   // Fill remaining slots with chronological passes (visible or not)
@@ -503,16 +584,51 @@ const getDisplayPasses = () => {
   return [...prioritized, ...rest].sort((a, b) => a.start - b.start).slice(0, MAX_DISPLAY_PASSES);
 };
 
+/**
+ * Navigate the passes list to the page containing a pass, then scroll to
+ * and briefly highlight its card. Returns false if the pass is not listed.
+ */
+const jumpToPass = (pass) => {
+  const displayPasses = getDisplayPasses();
+  const index = displayPasses.indexOf(pass);
+  if (index === -1) return false;
+
+  const targetPage = Math.floor(index / PASSES_PER_PAGE);
+  if (targetPage !== passPage) {
+    passPage = targetPage;
+    renderPasses();
+  }
+
+  requestAnimationFrame(() => {
+    const target = elements.passes.querySelector(
+      `[data-pass-start="${pass.start.toISOString()}"]`
+    );
+    if (!target) return;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+    // Restart the flash animation if it was already applied
+    target.classList.remove('pass--flash');
+    void target.offsetWidth;
+    target.classList.add('pass--flash');
+  });
+  return true;
+};
+
 const renderPassCard = (pass) => {
   const container = document.createElement('div');
-  container.className = `pass${pass.visible ? ' pass--visible' : ''}`;
+  const isShared = state.share.matched === pass;
+  container.className = `pass${pass.visible ? ' pass--visible' : ''}${isShared ? ' pass--shared' : ''}`;
+  container.dataset.passStart = pass.start.toISOString();
   const directionLabel = `${formatAzimuth(pass.startAz)} → ${formatAzimuth(
     pass.endAz
   )}`;
   container.innerHTML = `
     <div class="pass__header">
       <div>
-        <div class="badge${pass.visible ? ' badge--visible' : ''}">${pass.visible ? 'Visible' : 'Overhead'}</div>
+        <div class="pass__badges">
+          <div class="badge${pass.visible ? ' badge--visible' : ''}">${pass.visible ? 'Visible' : 'Overhead'}</div>
+          ${isShared ? '<div class="badge badge--shared">Shared pick</div>' : ''}
+        </div>
         <p class="card__title">${formatDateTime(
           pass.start,
           state.settings.timeFormat
@@ -561,28 +677,8 @@ const renderPassCard = (pass) => {
   const shareButton = container.querySelector('[data-share]');
   const remindButton = container.querySelector('[data-remind]');
 
-  shareButton.addEventListener('click', async () => {
-    const shareUrl = buildShareUrl(pass);
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: 'ISS pass details',
-          text: `Next ISS pass over ${state.locationName}`,
-          url: shareUrl
-        });
-      } catch {
-        // User cancelled share dialog
-      }
-    } else {
-      try {
-        await navigator.clipboard.writeText(shareUrl);
-        elements.locationFeedback.textContent =
-          'Share link copied to clipboard.';
-      } catch {
-        elements.locationFeedback.textContent =
-          'Unable to copy link.';
-      }
-    }
+  shareButton.addEventListener('click', () => {
+    sharePass(pass);
   });
 
   remindButton.addEventListener('click', () => {
@@ -594,6 +690,7 @@ const renderPassCard = (pass) => {
     link.download = `iss-pass-${pass.start.toISOString().slice(0, 10)}.ics`;
     link.click();
     URL.revokeObjectURL(url);
+    showToast('Calendar reminder downloaded.');
   });
 
   return container;
@@ -768,11 +865,54 @@ const recalcPasses = () => {
   if (!state.satrec) return;
   state.passes = computePasses(state.satrec, state.observer);
   passPage = 0;
+  if (state.share.active && state.share.passTime) {
+    state.share.matched = findSharedPass(state.passes, state.share.passTime);
+  }
   updateNextPass();
   renderTopPicks();
   renderPasses();
   updateVisibilityNow();
   updateCountdown();
+};
+
+/**
+ * Surface the pass a share link points at: jump to it and explain the
+ * outcome in the banner (matched, already occurred, or unmatchable).
+ */
+const focusSharedPass = () => {
+  if (!state.share.active) return;
+  const { timeFormat } = state.settings;
+
+  if (!state.share.passTime) {
+    showShareBanner('Shared location loaded — showing its latest pass predictions below.');
+    return;
+  }
+
+  const match = state.share.matched;
+  const now = new Date();
+  if (match && match.end > now) {
+    showShareBanner(`Shared pass loaded: ${formatDateTime(match.start, timeFormat)} — highlighted below.`);
+    jumpToPass(match);
+    return;
+  }
+
+  const sharedLabel = formatDateTime(state.share.passTime, timeFormat);
+  if (state.share.passTime <= now) {
+    showShareBanner(`The shared pass (${sharedLabel}) has already occurred. Showing the next opportunities for this location.`);
+  } else {
+    showShareBanner(`The shared pass (${sharedLabel}) no longer matches current orbital data. Showing the latest predictions for this location.`);
+  }
+};
+
+/**
+ * Leave shared-link mode: called when the user picks their own location so
+ * the saved location and a page refresh behave normally again.
+ */
+const clearShareContext = () => {
+  if (!state.share.active) return;
+  state.share = { active: false, passTime: null, matched: null };
+  hideShareBanner();
+  window.history.replaceState(null, '', window.location.pathname);
 };
 
 const applyLocation = async (lat, lon, name = '') => {
@@ -781,6 +921,8 @@ const applyLocation = async (lat, lon, name = '') => {
     elements.locationFeedback.textContent = 'Coordinates out of valid range.';
     return;
   }
+
+  clearShareContext();
 
   state.observer.lat = lat;
   state.observer.lon = lon;
@@ -880,38 +1022,37 @@ const updateLocationDisplay = () => {
 };
 
 const bindEvents = () => {
-  // Settings dropdown toggle
+  // Settings popover in the top bar (disclosure pattern)
   const settingsToggle = document.querySelector('#settings-toggle');
-  const settingsPanel = document.querySelector('.settings-dropdown');
-  const settingsContent = document.querySelector('#settings-content');
-  if (settingsToggle) {
-    const setSettingsExpanded = (expanded) => {
-      settingsToggle.setAttribute('aria-expanded', String(expanded));
-      if (settingsPanel) settingsPanel.classList.toggle('is-open', expanded);
-      if (!settingsContent) return;
-
-      if (expanded) {
-        settingsContent.hidden = false;
-        requestAnimationFrame(() => {
-          if (settingsPanel) settingsPanel.classList.add('is-open');
-        });
-      } else {
-        if (settingsContent.hidden) return;
-        const handleClose = () => {
-          settingsContent.hidden = true;
-          settingsContent.removeEventListener('transitionend', handleClose);
-        };
-        settingsContent.addEventListener('transitionend', handleClose);
-      }
+  const settingsMenu = document.querySelector('#settings-menu');
+  if (settingsToggle && settingsMenu) {
+    const setSettingsOpen = (open) => {
+      settingsToggle.setAttribute('aria-expanded', String(open));
+      settingsMenu.hidden = !open;
     };
 
-    const isExpanded = settingsToggle.getAttribute('aria-expanded') === 'true';
-    setSettingsExpanded(isExpanded);
-
     settingsToggle.addEventListener('click', () => {
-      const expanded = settingsToggle.getAttribute('aria-expanded') === 'true';
-      setSettingsExpanded(!expanded);
+      setSettingsOpen(settingsMenu.hidden);
     });
+
+    // Close when tapping/clicking outside the menu
+    document.addEventListener('pointerdown', (event) => {
+      if (settingsMenu.hidden) return;
+      if (settingsMenu.contains(event.target) || settingsToggle.contains(event.target)) return;
+      setSettingsOpen(false);
+    });
+
+    // Close on Escape and hand focus back to the toggle
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !settingsMenu.hidden) {
+        setSettingsOpen(false);
+        settingsToggle.focus();
+      }
+    });
+  }
+
+  if (elements.shareBannerDismiss) {
+    elements.shareBannerDismiss.addEventListener('click', hideShareBanner);
   }
 
   window.addEventListener('resize', () => {
@@ -1099,18 +1240,19 @@ const startLoop = () => {
   loopId = setInterval(updateLoop, state.settings.updateRate);
 };
 
+/**
+ * Apply share-link params. Returns true when a valid shared location was
+ * found — in that case the link wins over the locally saved location.
+ */
 const hydrateFromUrl = () => {
-  const params = new URLSearchParams(window.location.search);
-  const lat = params.get('lat');
-  const lon = params.get('lon');
-  if (lat && lon) {
-    const parsedLat = parseFloat(lat);
-    const parsedLon = parseFloat(lon);
-    if (!Number.isNaN(parsedLat) && !Number.isNaN(parsedLon)) {
-      state.observer.lat = parsedLat;
-      state.observer.lon = parsedLon;
-    }
-  }
+  const { observer, passTime, locationName } = parseShareParams(window.location.search);
+  if (!observer) return false;
+  state.observer.lat = observer.lat;
+  state.observer.lon = observer.lon;
+  state.locationName = locationName || 'Shared location';
+  state.share.active = true;
+  state.share.passTime = passTime;
+  return true;
 };
 
 // Register service worker for PWA
@@ -1128,7 +1270,7 @@ const init = async () => {
   try {
     elements.issStatus.textContent = 'Initializing...';
     loadSettings();
-    hydrateFromUrl();
+    const fromShareLink = hydrateFromUrl();
     initVisualization();
     applySettings();
     updateLocationInputs();
@@ -1138,20 +1280,35 @@ const init = async () => {
       resizeGlobe();
     });
 
-    // Load saved location
-    try {
-      const savedLocation = localStorage.getItem('vasey-location');
-      if (savedLocation) {
-        const parsed = JSON.parse(savedLocation);
-        state.observer.lat = parsed.lat;
-        state.observer.lon = parsed.lon;
-        state.locationName = parsed.name || 'Custom location';
-        map.setView([state.observer.lat, state.observer.lon], 3);
-        userMarker.setLatLng([state.observer.lat, state.observer.lon]);
-        updateLocationInputs();
+    if (!fromShareLink) {
+      // Load saved location — skipped for share links so the link's
+      // location is never overridden by a previously saved one
+      try {
+        const savedLocation = localStorage.getItem('vasey-location');
+        if (savedLocation) {
+          const parsed = JSON.parse(savedLocation);
+          state.observer.lat = parsed.lat;
+          state.observer.lon = parsed.lon;
+          state.locationName = parsed.name || 'Custom location';
+          map.setView([state.observer.lat, state.observer.lon], 3);
+          userMarker.setLatLng([state.observer.lat, state.observer.lon]);
+          updateLocationInputs();
+        }
+      } catch {
+        // localStorage unavailable or corrupt
       }
-    } catch {
-      // localStorage unavailable or corrupt
+    } else if (state.locationName === 'Shared location') {
+      // Link carried no place name — resolve one in the background
+      reverseGeocode(state.observer.lat, state.observer.lon)
+        .then((name) => {
+          if (name && state.share.active) {
+            state.locationName = name;
+            updateLocationDisplay();
+          }
+        })
+        .catch(() => {
+          // Keep the placeholder name
+        });
     }
     updateLocationDisplay();
 
@@ -1162,6 +1319,7 @@ const init = async () => {
         const tle = await fetchTle();
         state.satrec = getSatrec(tle);
         recalcPasses();
+        focusSharedPass();
         startLoop();
         updateLoop();
         break;
