@@ -111,25 +111,114 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Top safe-area scrim — opaque mask over the iOS status bar / Dynamic Island
-   region so scrolling content passes beneath the system clock and icons.
-   Filled with --bg-pure to exactly match the hero surface that owns the top
-   edge at rest (and the #ffffff theme-color / manifest theme_color), so the
-   scrim is invisible when scrolled to top. The hero's own
-   var(--safe-top) padding keeps its content clear of this region —
-   the inset is applied once, there. Height collapses to 0 where no top inset
-   exists (desktop, landscape). */
-body::before {
-  content: '';
-  position: fixed;
+/* === TOP BAR === */
+/* Sticky bar owning the top screen edge: it carries the top safe-area inset
+   (applied once, here — see tasks/lessons.md) and masks content scrolling
+   beneath the iOS status bar. Lives outside #app because #app's
+   overflow-x: hidden would disable position: sticky. */
+.topbar {
+  position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
-  height: var(--safe-top);
+  /* Above Leaflet panes/controls (z-index ≤ 1000) so map content passes under */
+  z-index: 1100;
+  background: rgba(255, 255, 255, 0.92);
+  -webkit-backdrop-filter: blur(14px) saturate(1.4);
+  backdrop-filter: blur(14px) saturate(1.4);
+  border-bottom: 1px solid var(--border);
+  padding-top: var(--safe-top);
+  padding-left: calc(5vw + var(--safe-left));
+  padding-right: calc(5vw + var(--safe-right));
+}
+
+.topbar__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 52px;
+}
+
+.topbar__brand {
+  font-family: 'Bebas Neue', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  color: #9aa7d6;
+  margin: 0;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.topbar__brand-category {
+  color: var(--turquoise-dark);
+}
+
+.topbar__settings {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border: 1px solid var(--border-strong);
   background: var(--bg-pure);
-  /* Above Leaflet panes/controls (z-index ≤ 1000) so map content also masks */
-  z-index: 1200;
-  pointer-events: none;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.4rem 0.95rem;
+  border-radius: 999px;
+  cursor: pointer;
+  min-height: 40px;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.topbar__settings:hover {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--bg-pure);
+}
+
+.topbar__settings:focus-visible {
+  outline: 2px solid var(--turquoise-dark);
+  outline-offset: 2px;
+}
+
+.topbar__settings-icon {
+  flex-shrink: 0;
+  transition: transform 0.25s ease;
+}
+
+.topbar__settings[aria-expanded="true"] .topbar__settings-icon {
+  transform: rotate(45deg);
+}
+
+/* Settings popover anchored under the bar */
+.settings-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: calc(5vw + var(--safe-right));
+  width: min(460px, calc(100vw - 10vw - var(--safe-left) - var(--safe-right)));
+  background: var(--panel);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-xl);
+  padding: 1.2rem 1.4rem 1.4rem;
+  animation: settingsMenuIn 0.18s ease-out;
+}
+
+.settings-menu[hidden] {
+  display: none;
+}
+
+.settings-menu .section-title {
+  display: block;
+  margin-bottom: 0.9rem;
+}
+
+@keyframes settingsMenuIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 #app {
@@ -170,7 +259,6 @@ h1, h2, h3 {
 /* === HERO === */
 .hero {
   padding: 1rem 5vw 1rem;
-  padding-top: calc(0.75rem + var(--safe-top));
   padding-left: calc(5vw + var(--safe-left));
   padding-right: calc(5vw + var(--safe-right));
   background: var(--bg-pure);
@@ -192,19 +280,6 @@ h1, h2, h3 {
   max-width: 1100px;
   margin: 0 auto;
   text-align: center;
-}
-
-.hero__eyebrow {
-  font-family: 'Bebas Neue', sans-serif;
-  text-transform: uppercase;
-  letter-spacing: 0.3em;
-  color: #9aa7d6;
-  margin: 0 0 0.25rem;
-  font-size: 0.8rem;
-}
-
-.hero__eyebrow-category {
-  color: var(--turquoise-dark);
 }
 
 .hero__brand {
@@ -619,6 +694,36 @@ main {
   color: var(--bg-pure);
 }
 
+.badge--rank {
+  background: var(--turquoise-dark);
+  color: var(--bg-pure);
+}
+
+.badge--shared {
+  background: var(--turquoise-soft);
+  color: #0f766e;
+  border: 1px solid rgba(45, 212, 191, 0.45);
+}
+
+/* === TOP PICK CARDS === */
+.card__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.card__actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.9rem;
+}
+
+.card__actions .button {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+}
+
 /* === VISUALIZATION === */
 .visualization__controls {
   display: flex;
@@ -719,6 +824,39 @@ main {
   position: relative;
 }
 
+/* Pass a share link points at — steady emphasis instead of the pulse */
+.pass--shared {
+  border: 1.5px solid var(--turquoise-dark);
+  box-shadow: 0 0 0 3px var(--turquoise-soft);
+  animation: fadeIn 0.4s ease-out;
+}
+
+/* Brief attention flash when jumping to a pass (shared link / "View pass") */
+.pass--flash {
+  animation: passFlash 1.8s ease-out;
+}
+
+.pass--shared.pass--flash {
+  animation: passFlash 1.8s ease-out, fadeIn 0.4s ease-out;
+}
+
+@keyframes passFlash {
+  0%, 45% {
+    outline: 3px solid rgba(45, 212, 191, 0.75);
+    outline-offset: 3px;
+  }
+  100% {
+    outline: 3px solid transparent;
+    outline-offset: 3px;
+  }
+}
+
+.pass__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
 .pass__header {
   grid-column: 1 / -1;
   display: flex;
@@ -748,73 +886,90 @@ main {
   color: var(--text);
 }
 
-/* === SETTINGS DROPDOWN === */
-.settings-dropdown {
-  padding: 0;
-  overflow: hidden;
-}
-
-.settings-dropdown__toggle {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: 1rem 1.6rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-family: inherit;
-  color: var(--text);
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-}
-
-.settings-dropdown__toggle:hover {
-  background: var(--accent-soft);
-}
-
-.settings-dropdown__chevron {
-  color: var(--muted);
-  transition: transform 0.25s ease;
-  flex-shrink: 0;
-}
-
-.settings-dropdown__toggle[aria-expanded="true"] .settings-dropdown__chevron {
-  transform: rotate(180deg);
-}
-
-.settings-dropdown__content {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 0.25s ease;
-}
-
-.settings-dropdown__content[hidden] {
-  display: none;
-}
-
-.settings-dropdown__content > .settings__grid {
-  overflow: hidden;
-  min-height: 0;
-}
-
-.settings-dropdown__toggle[aria-expanded="true"] + .settings-dropdown__content {
-  grid-template-rows: 1fr;
-}
-
-/* Fallback for mobile browsers without grid-template-rows transition support */
-.settings-dropdown.is-open .settings-dropdown__content {
-  grid-template-rows: 1fr;
-}
-
-.settings-dropdown__content .settings__grid {
-  padding: 0 1.6rem 1.4rem;
-}
-
+/* === SETTINGS GRID (inside topbar popover) === */
 .settings__grid {
   display: grid;
   gap: 1rem;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+/* === SHARE BANNER === */
+.share-banner[hidden] {
+  display: none;
+}
+
+.share-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.7rem 0.9rem;
+  margin-bottom: 1rem;
+  background: var(--turquoise-soft);
+  border: 1px solid rgba(45, 212, 191, 0.35);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  animation: fadeIn 0.4s ease-out;
+}
+
+.share-banner__icon {
+  flex-shrink: 0;
+  color: var(--turquoise-dark);
+  margin-top: 3px;
+}
+
+.share-banner__text {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  flex: 1;
+}
+
+.share-banner__dismiss {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  margin: -4px -4px 0 0;
+  transition: background 0.2s ease, color 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.share-banner__dismiss:hover {
+  background: rgba(45, 212, 191, 0.18);
+  color: var(--text);
+}
+
+/* === TOAST === */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(1.25rem + var(--safe-bottom));
+  transform: translate(-50%, 12px);
+  background: var(--text);
+  color: var(--bg-pure);
+  font-size: 0.88rem;
+  font-weight: 500;
+  padding: 0.65rem 1.2rem;
+  border-radius: 999px;
+  box-shadow: var(--shadow-xl);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  z-index: 1300;
+  max-width: min(92vw, 480px);
+  text-align: center;
+}
+
+.toast--visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
 }
 
 /* === VASEY/AI Universal Footer === */
@@ -1108,9 +1263,18 @@ main {
 
 /* === RESPONSIVE - Mobile First === */
 @media (max-width: 900px) {
+  .topbar {
+    padding-left: calc(4vw + var(--safe-left));
+    padding-right: calc(4vw + var(--safe-right));
+  }
+
+  .settings-menu {
+    right: calc(4vw + var(--safe-right));
+    width: min(460px, calc(100vw - 8vw - var(--safe-left) - var(--safe-right)));
+  }
+
   .hero {
     padding: 0.75rem 4vw 0.75rem;
-    padding-top: calc(0.5rem + var(--safe-top));
     padding-left: calc(4vw + var(--safe-left));
     padding-right: calc(4vw + var(--safe-right));
   }
@@ -1153,10 +1317,6 @@ main {
 
   .hero h1 {
     font-size: 2.1rem;
-  }
-
-  .hero__eyebrow {
-    font-size: 0.75rem;
   }
 
   .hero__subhead {
@@ -1222,12 +1382,8 @@ main {
     grid-template-columns: 1fr 1fr;
   }
 
-  .settings-dropdown__toggle {
-    padding: 0.8rem 1.2rem;
-  }
-
-  .settings-dropdown__content .settings__grid {
-    padding: 0 1.2rem 1.2rem;
+  .settings-menu {
+    padding: 1.1rem 1.2rem 1.2rem;
   }
 
   .map, .globe {
@@ -1247,8 +1403,17 @@ main {
     padding: 0.6rem 0.8rem;
   }
 
-  .footer {
-    font-size: 0.78rem;
+  /* Keep card and pass actions compact and side-by-side on phones */
+  .card__actions .button,
+  .pass__actions .button {
+    width: auto;
+    flex: 1 1 auto;
+    font-size: 0.85rem;
+    padding: 0.6rem 0.8rem;
+  }
+
+  .pass__actions {
+    width: 100%;
   }
 }
 
@@ -1280,13 +1445,6 @@ main {
 
   .map, .globe {
     height: 260px;
-  }
-}
-
-/* PWA standalone mode adjustments */
-@media (display-mode: standalone) {
-  .hero {
-    padding-top: calc(1.25rem + var(--safe-top));
   }
 }
 

@@ -9,7 +9,7 @@
   <a href="https://developer.mozilla.org/docs/Web/JavaScript"><img src="https://img.shields.io/badge/JavaScript-ES2022-F7DF1E?logo=javascript&logoColor=000000" alt="JavaScript"></a>
   <a href="https://vite.dev"><img src="https://img.shields.io/badge/Vite-7.x-646CFF?logo=vite&logoColor=ffffff" alt="Vite"></a>
   <a href="#pwa"><img src="https://img.shields.io/badge/PWA-Installable-5A0FC8?logo=pwa&logoColor=ffffff" alt="PWA"></a>
-  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/Version-1.3.2-111827" alt="Version"></a>
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/Version-1.4.0-111827" alt="Version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-3DA639" alt="License"></a>
   <a href="https://nodejs.org"><img src="https://img.shields.io/badge/Node-%3E%3D18-339933?logo=node.js&logoColor=ffffff" alt="Node"></a>
   <a href="https://celestrak.org"><img src="https://img.shields.io/badge/Orbital%20Data-Celestrak-0066CC" alt="Orbital Data"></a>
@@ -28,7 +28,8 @@ A real-time International Space Station tracker that combines orbital telemetry,
 - **Top pick recommendations** — best viewing opportunities scored by elevation (50%), duration (30%), and sky darkness (20%).
 - **Countdown timer** — live countdown to the next upcoming pass.
 - **Dual visualization** — synchronized 2D Leaflet ground track map and 3D Globe.gl interactive globe with day/night terminator overlay and a 3D ISS model rendered on the globe.
-- **Reminders + sharing** — downloadable `.ics` calendar invites and shareable URLs with encoded pass details.
+- **Reminders + sharing** — downloadable `.ics` calendar invites and shareable deep links that open with the shared location applied and the shared pass pinned, highlighted, and scrolled into view.
+- **Sticky top bar with settings** — brand bar pinned to the top of the page with a settings popover (units, update rate, time format, default view) reachable from anywhere in the app.
 - **Installable PWA** — service worker with offline caching, web app manifest, and iOS home screen support.
 - **Mobile-first design** — optimized for iOS with safe area insets, touch-friendly controls, and responsive breakpoints.
 - **Monochrome aesthetic** — clean light backgrounds with dark text providing stark contrast for a space-age look.
@@ -108,7 +109,7 @@ Setting a contact email is recommended for production to comply with the [OpenSt
 ```
 .
 ├── index.html              # App shell with PWA meta tags
-├── package.json            # Dependencies and scripts (v1.3.2)
+├── package.json            # Dependencies and scripts (v1.4.0)
 ├── vite.config.js          # Vite build configuration
 ├── vercel.json             # Vercel deployment and headers
 ├── .env.example            # Environment variable template
@@ -119,7 +120,8 @@ Setting a contact email is recommended for production to comply with the [OpenSt
 │   └── lib/
 │       ├── format.js       # Formatting helpers, scoring, brightness
 │       ├── orbit.js        # TLE fetch/cache, propagation, sun position
-│       └── passes.js       # 72-hour pass prediction, visibility
+│       ├── passes.js       # 72-hour pass prediction, visibility
+│       └── share.js        # Share link build/parse + shared pass matching
 ├── public/
 │   ├── config.js           # Runtime configuration
 │   ├── manifest.json       # PWA web app manifest
@@ -127,7 +129,8 @@ Setting a contact email is recommended for production to comply with the [OpenSt
 │   ├── favicon.svg         # Browser tab icon (square-cropped ISS)
 │   └── iss-icon.svg        # ISS illustration icon
 ├── tests/
-│   └── format.test.js      # Unit tests for format helpers
+│   ├── format.test.js      # Unit tests for format helpers
+│   └── share.test.js       # Unit tests for share link helpers
 ├── scripts/
 │   ├── lint.mjs            # Syntax linter
 │   ├── build.mjs           # Legacy build script
