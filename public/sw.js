@@ -1,4 +1,4 @@
-const CACHE_NAME = 'iss-observer-v1.4.1';
+const CACHE_NAME = 'iss-observer-v1.4.2';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
