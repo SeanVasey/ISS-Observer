@@ -9,7 +9,7 @@
   <a href="https://developer.mozilla.org/docs/Web/JavaScript"><img src="https://img.shields.io/badge/JavaScript-ES2022-F7DF1E?logo=javascript&logoColor=000000" alt="JavaScript"></a>
   <a href="https://vite.dev"><img src="https://img.shields.io/badge/Vite-7.x-646CFF?logo=vite&logoColor=ffffff" alt="Vite"></a>
   <a href="#pwa"><img src="https://img.shields.io/badge/PWA-Installable-5A0FC8?logo=pwa&logoColor=ffffff" alt="PWA"></a>
-  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/Version-1.4.0-111827" alt="Version"></a>
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/Version-1.4.1-111827" alt="Version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-3DA639" alt="License"></a>
   <a href="https://nodejs.org"><img src="https://img.shields.io/badge/Node-%3E%3D18-339933?logo=node.js&logoColor=ffffff" alt="Node"></a>
   <a href="https://celestrak.org"><img src="https://img.shields.io/badge/Orbital%20Data-Celestrak-0066CC" alt="Orbital Data"></a>
@@ -109,7 +109,7 @@ Setting a contact email is recommended for production to comply with the [OpenSt
 ```
 .
 ├── index.html              # App shell with PWA meta tags
-├── package.json            # Dependencies and scripts (v1.4.0)
+├── package.json            # Dependencies and scripts (v1.4.1)
 ├── vite.config.js          # Vite build configuration
 ├── vercel.json             # Vercel deployment and headers
 ├── .env.example            # Environment variable template
@@ -123,16 +123,22 @@ Setting a contact email is recommended for production to comply with the [OpenSt
 │       ├── passes.js       # 72-hour pass prediction, visibility
 │       └── share.js        # Share link build/parse + shared pass matching
 ├── public/
-│   ├── config.js           # Runtime configuration
-│   ├── manifest.json       # PWA web app manifest
-│   ├── sw.js               # Service worker (cache-first static, network-first API)
-│   ├── favicon.svg         # Browser tab icon (square-cropped ISS)
-│   └── iss-icon.svg        # ISS illustration icon
+│   ├── config.js               # Runtime configuration
+│   ├── manifest.json           # PWA web app manifest
+│   ├── sw.js                   # Service worker (cache-first static, network-first API)
+│   ├── iss-icon-ios.svg        # App icon — glassy rounded tile (favicon + iOS/PWA source)
+│   ├── iss-icon.svg            # In-app logo — transparent ISS badge (hero + map marker)
+│   ├── apple-touch-icon.png    # 180×180 iOS Home Screen icon
+│   ├── icon-192.png            # 192×192 PWA icon (any)
+│   ├── icon-512.png            # 512×512 PWA icon (any)
+│   ├── icon-maskable-512.png   # 512×512 PWA icon (maskable, safe-zone padded)
+│   └── favicon-16/32/96.png    # Legacy PNG favicons
 ├── tests/
 │   ├── format.test.js      # Unit tests for format helpers
 │   └── share.test.js       # Unit tests for share link helpers
 ├── scripts/
 │   ├── lint.mjs            # Syntax linter
+│   ├── generate-icons.mjs  # Rasterize app icon SVG → PNG sizes (Playwright)
 │   ├── build.mjs           # Legacy build script
 │   └── serve.mjs           # Legacy dev server
 ├── tasks/

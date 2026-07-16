@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.1] — 2026-07-16
+
+### Fixed
+- **iOS Home Screen icon now works.** "Add to Home Screen" previously fell back to a page screenshot because the only `apple-touch-icon` was an SVG, which iOS ignores. Shipped a proper `180×180` PNG `apple-touch-icon` (plus `192`/`512` PWA icons, a safe-zone-padded `512` maskable icon, and `16`/`32`/`96` PNG favicons) rasterized from the new `iss-icon-ios.svg` app icon.
+- **Corrected broken icon paths in `index.html`.** The favicon, apple-touch-icon, hero logo, and manifest links used `./public/…` relative paths that Vite either bundled to hashed asset URLs or dropped in production. All now use root-absolute paths (`/…`) that resolve correctly from the `public/` directory in both dev and build.
+
+### Added
+- **New app icon** `public/iss-icon-ios.svg` — a glassy rounded tile enclosing the ISS badge — now drives the browser favicon and every installed-app surface (iOS Home Screen, Android/desktop PWA install).
+- `scripts/generate-icons.mjs` — reproducible icon pipeline that rasterizes the app-icon SVG (gradients + glow filters) into all required PNG sizes via headless Chromium.
+
+### Changed
+- The transparent-background `iss-icon.svg` badge is retained as the **in-app logo** (hero header and map marker) where a transparent background is ideal; the glassy tile is reserved for app-icon/favicon surfaces.
+- `manifest.json` icons switched from two SVGs to PNG `any` + `maskable` entries (with the scalable SVG kept as a supplementary `any` icon).
+- Service worker cache bumped to `iss-observer-v1.4.1` and now precaches every icon asset and `manifest.json`.
+- Simplified the `vercel.json` SPA rewrite to an extension-based rule so all current and future static assets are served directly instead of enumerating each filename.
+- Removed the unused duplicate `public/favicon.svg` (byte-identical to `iss-icon.svg`).
+- Bumped version to 1.4.1 across `package.json`, `index.html` (pill + footer), the service worker cache name, and README.
+
 ## [1.4.0] — 2026-07-10
 
 ### Fixed
