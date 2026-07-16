@@ -1,9 +1,17 @@
-const CACHE_NAME = 'iss-observer-v1.4.0';
+const CACHE_NAME = 'iss-observer-v1.4.1';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
+  '/manifest.json',
   '/iss-icon.svg',
-  '/favicon.svg'
+  '/iss-icon-ios.svg',
+  '/apple-touch-icon.png',
+  '/icon-192.png',
+  '/icon-512.png',
+  '/icon-maskable-512.png',
+  '/favicon-96.png',
+  '/favicon-32.png',
+  '/favicon-16.png'
 ];
 
 self.addEventListener('install', (event) => {
