@@ -15,8 +15,12 @@
 - `public/config.js` — Runtime configuration (Nominatim email).
 - `public/manifest.json` — PWA web app manifest.
 - `public/sw.js` — Service worker for offline caching.
-- `public/iss-icon.svg` — ISS badge icon (256x256).
-- `public/favicon.svg` — Browser tab icon (256x256 badge).
+- `public/iss-icon.svg` — Transparent-background ISS badge, used as the in-app logo (hero header, map marker).
+- `public/iss-icon-ios.svg` — Full-bleed app-icon tile (1024×1024) enclosing the ISS badge; source for the favicon and all rasterized app-icon PNGs.
+- `public/apple-touch-icon.png` — 180×180 iOS Home Screen icon (rasterized from `iss-icon-ios.svg`).
+- `public/icon-192.png`, `public/icon-512.png` — PWA install icons (`purpose: any`).
+- `public/icon-maskable-512.png` — 512×512 safe-zone-padded maskable PWA icon.
+- `public/favicon-16.png`, `public/favicon-32.png`, `public/favicon-96.png` — PNG favicons.
 
 ## Testing
 
@@ -29,6 +33,7 @@
 - `vercel.json` — Vercel deployment, headers, and SPA rewrites.
 - `.github/workflows/ci.yml` — CI pipeline (install → lint → test → build).
 - `scripts/lint.mjs` — Syntax lint (`node --check`).
+- `scripts/generate-icons.mjs` — Rasterizes `public/iss-icon-ios.svg` into all app-icon/favicon PNG sizes via headless Chromium.
 - `scripts/build.mjs` — Legacy static build packaging.
 - `scripts/serve.mjs` — Legacy local dev server.
 - `.editorconfig`, `.gitignore`, `.env.example` — Repo hygiene.

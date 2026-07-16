@@ -15,15 +15,16 @@
     <clipPath id="tp_clip">
       <rect x="22" y="22" width="980" height="980" rx="212" ry="212"/>
     </clipPath>
-  </defs>
+  <linearGradient id="fb_border" x1="0" y1="0" x2="0" y2="1024" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#24e9ff"/><stop offset=".45" stop-color="#00E5FF"/><stop offset="1" stop-color="#00aec2"/></linearGradient></defs>
+<!-- Full-bleed border plate: opaque edge-to-edge; iOS applies its own squircle mask, so light/dark mode never shows through -->
+<rect x="0" y="0" width="1024" height="1024" fill="url(#fb_border)"/>
 
-  <!-- 1. Outer glow (unclipped, blurred, bleeds outward past the body) -->
-  <rect x="18" y="18" width="988" height="988" rx="216" ry="216" fill="none" stroke="#00E5FF" stroke-width="16" opacity="0.85" filter="url(#tp_glow)"/>
 
   <!-- clipped: body + sheen + mark -->
   <g clip-path="url(#tp_clip)">
     <rect x="22" y="22" width="980" height="980" rx="212" ry="212" fill="url(#tp_body)"/>          <!-- 2. Body glass -->
-    <rect x="22" y="22" width="980" height="980" rx="212" ry="212" fill="url(#tp_sheen)"/>         <!-- 3. Upper sheen -->
+    <rect x="22" y="22" width="980" height="980" rx="212" ry="212" fill="url(#tp_sheen)"/>
+    <rect x="22" y="22" width="980" height="980" rx="212" ry="212" fill="none" stroke="#00E5FF" stroke-width="36" opacity="0.5" filter="url(#tp_glow)"/>         <!-- 3. Upper sheen -->
     <g transform="translate(512,512) scale(3.2914) translate(-128,-128)">                          <!-- 4. Mark (unaltered) -->
 <defs>
     <radialGradient id="bg" cx="32%" cy="28%" r="85%">
@@ -81,7 +82,7 @@
     <clipPath id="badgeClip">
       <circle cx="128" cy="128" r="112"/>
     </clipPath>
-  </defs>
+</defs>
 
   <circle cx="128" cy="128" r="112" fill="url(#bg)"/>
 

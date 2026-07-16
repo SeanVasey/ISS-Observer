@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.2] — 2026-07-16
+
+### Changed
+- **Updated app icon (`iss-icon-ios.svg`).** Replaced the outer blurred glow with an opaque, full-bleed border plate that covers the tile edge-to-edge. iOS applies its own squircle mask to Home Screen icons, so the previous design's transparent corners could let the system light/dark background bleed through the mask edge; the full-bleed plate guarantees an opaque, consistent tile in both appearance modes. Added an inner sheen stroke and a crisp inner edge line for depth.
+- Regenerated every rasterized icon from the updated SVG: `apple-touch-icon.png` (180), `icon-192.png`, `icon-512.png`, the `512` maskable icon, and the `16`/`32`/`96` PNG favicons.
+- The transparent-background `iss-icon.svg` badge remains the **in-app logo** (hero header and map marker) where a transparent background is ideal — unchanged, since its ISS mark is identical to the one inside the app tile.
+- Service worker cache bumped to `iss-observer-v1.4.2` so installed clients refetch the updated icon assets.
+- Bumped version to 1.4.2 across `package.json`, `index.html` (pill + footer), the service worker cache name, and README.
+
 ## [1.4.1] — 2026-07-16
 
 ### Fixed
