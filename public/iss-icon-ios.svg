@@ -15,7 +15,12 @@
     <clipPath id="tp_clip">
       <rect x="22" y="22" width="980" height="980" rx="212" ry="212"/>
     </clipPath>
-  <linearGradient id="fb_border" x1="0" y1="0" x2="0" y2="1024" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#24e9ff"/><stop offset=".45" stop-color="#00E5FF"/><stop offset="1" stop-color="#00aec2"/></linearGradient></defs>
+    <linearGradient id="fb_border" x1="0" y1="0" x2="0" y2="1024" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#24E9FF"/>
+      <stop offset="0.45" stop-color="#00E5FF"/>
+      <stop offset="1" stop-color="#00AEC2"/>
+    </linearGradient>
+  </defs>
 <!-- Full-bleed border plate: opaque edge-to-edge; iOS applies its own squircle mask, so light/dark mode never shows through -->
 <rect x="0" y="0" width="1024" height="1024" fill="url(#fb_border)"/>
 
